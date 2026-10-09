@@ -1,0 +1,26 @@
+# Marathoning schedule config. Edit and re-run `python cli.py generate-schedule`.
+
+race:
+  name: Hamburg Marathon
+  date: 2027-04-25
+
+goal:
+  # Goal marathon pace in min:sec per km. 4:30/km = ~3:09:53 marathon.
+  pace_per_km: "4:30"
+
+training:
+  # Monday the 18-week, book-structured race-specific plan should start.
+  # Anything between today and this date is base-building (flexible, easy
+  # mileage build-up, no structured workouts).
+  plan_18wk_start: 2026-12-21
+  # Peak weekly mileage for the race-specific plan (km). 55 mi/wk ~= 89 km,
+  # the top of the book's "Up to 55 Miles per Week" track.
+  peak_weekly_km: 89
+  start_weekly_km: 53
+  # Base-building starting weekly volume (km) for the first base week.
+  base_building_start_km: 25
+  # If true (your preference), replace every LT/VO2max/hill-sprint session
+  # with marathon-pace or general-aerobic running. Short strides are kept
+  # but marked optional since they're brief enough not to count as real
+  # "fast running".
+  avoid_fast_running: true
