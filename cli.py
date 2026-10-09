@@ -49,6 +49,7 @@ def cmd_generate_schedule(args: argparse.Namespace) -> None:
         end_before=plan_start,
         start_km=cfg["training"]["base_building_start_km"],
         target_km=cfg["training"]["start_weekly_km"],
+        peak_km=cfg["training"]["peak_weekly_km"],
     )
     race_weeks = schedule.generate_18wk_plan(
         plan_start=plan_start,

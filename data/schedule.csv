@@ -1,110 +1,92 @@
 date,phase,weeks_out,workout,distance_km,notes
-2026-10-12,Base-building,,Easy run (flexible day),4.5,move to whichever day suits you this week
-2026-10-13,Base-building,,Easy run (flexible day),4.5,move to whichever day suits you this week
-2026-10-14,Base-building,,Easy run (flexible day),4.5,move to whichever day suits you this week
-2026-10-15,Base-building,,Easy run (flexible day),4.5,move to whichever day suits you this week
-2026-10-16,Base-building,,Long run (flexible day),7.0,move to whichever day suits you this week
-2026-10-19,Base-building,,Easy run (flexible day),5.0,move to whichever day suits you this week
-2026-10-20,Base-building,,Easy run (flexible day),5.0,move to whichever day suits you this week
-2026-10-21,Base-building,,Easy run (flexible day),5.0,move to whichever day suits you this week
-2026-10-22,Base-building,,Easy run (flexible day),5.0,move to whichever day suits you this week
-2026-10-23,Base-building,,Long run (flexible day),7.8,move to whichever day suits you this week
-2026-10-26,Base-building,,Easy run (flexible day),5.6,move to whichever day suits you this week
-2026-10-27,Base-building,,Easy run (flexible day),5.6,move to whichever day suits you this week
-2026-10-28,Base-building,,Easy run (flexible day),5.6,move to whichever day suits you this week
-2026-10-29,Base-building,,Easy run (flexible day),5.6,move to whichever day suits you this week
-2026-10-30,Base-building,,Long run (flexible day),8.7,move to whichever day suits you this week
-2026-11-02,Base-building,,Easy run (flexible day),4.8,move to whichever day suits you this week
-2026-11-03,Base-building,,Easy run (flexible day),4.8,move to whichever day suits you this week
-2026-11-04,Base-building,,Easy run (flexible day),4.8,move to whichever day suits you this week
-2026-11-05,Base-building,,Easy run (flexible day),4.8,move to whichever day suits you this week
-2026-11-06,Base-building,,Long run (flexible day),7.6,move to whichever day suits you this week
-2026-11-09,Base-building,,Easy run (flexible day),6.7,move to whichever day suits you this week
-2026-11-10,Base-building,,Easy run (flexible day),6.7,move to whichever day suits you this week
-2026-11-11,Base-building,,Easy run (flexible day),6.7,move to whichever day suits you this week
-2026-11-12,Base-building,,Easy run (flexible day),6.7,move to whichever day suits you this week
-2026-11-13,Base-building,,Long run (flexible day),10.4,move to whichever day suits you this week
-2026-11-16,Base-building,,Easy run (flexible day),7.4,move to whichever day suits you this week
-2026-11-17,Base-building,,Easy run (flexible day),7.4,move to whichever day suits you this week
-2026-11-18,Base-building,,Easy run (flexible day),7.4,move to whichever day suits you this week
-2026-11-19,Base-building,,Easy run (flexible day),7.4,move to whichever day suits you this week
-2026-11-20,Base-building,,Long run (flexible day),11.5,move to whichever day suits you this week
-2026-11-23,Base-building,,Easy run (flexible day),7.9,move to whichever day suits you this week
-2026-11-24,Base-building,,Easy run (flexible day),7.9,move to whichever day suits you this week
-2026-11-25,Base-building,,Easy run (flexible day),7.9,move to whichever day suits you this week
-2026-11-26,Base-building,,Easy run (flexible day),7.9,move to whichever day suits you this week
-2026-11-27,Base-building,,Long run (flexible day),12.3,move to whichever day suits you this week
-2026-11-30,Base-building,,Easy run (flexible day),6.8,move to whichever day suits you this week
-2026-12-01,Base-building,,Easy run (flexible day),6.8,move to whichever day suits you this week
-2026-12-02,Base-building,,Easy run (flexible day),6.8,move to whichever day suits you this week
-2026-12-03,Base-building,,Easy run (flexible day),6.8,move to whichever day suits you this week
-2026-12-04,Base-building,,Long run (flexible day),10.6,move to whichever day suits you this week
-2026-12-07,Base-building,,Easy run (flexible day),9.0,move to whichever day suits you this week
-2026-12-08,Base-building,,Easy run (flexible day),9.0,move to whichever day suits you this week
-2026-12-09,Base-building,,Easy run (flexible day),9.0,move to whichever day suits you this week
-2026-12-10,Base-building,,Easy run (flexible day),9.0,move to whichever day suits you this week
-2026-12-11,Base-building,,Long run (flexible day),14.0,move to whichever day suits you this week
-2026-12-14,Base-building,,Easy run (flexible day),9.6,move to whichever day suits you this week
-2026-12-15,Base-building,,Easy run (flexible day),9.6,move to whichever day suits you this week
-2026-12-16,Base-building,,Easy run (flexible day),9.6,move to whichever day suits you this week
-2026-12-17,Base-building,,Easy run (flexible day),9.6,move to whichever day suits you this week
-2026-12-18,Base-building,,Long run (flexible day),14.8,move to whichever day suits you this week
+2026-10-12,Base-building,,Easy run (flexible day),7.2,move to whichever day suits you this week
+2026-10-13,Base-building,,Easy run (flexible day),7.2,move to whichever day suits you this week
+2026-10-14,Base-building,,Long run (flexible day),10.5,move to whichever day suits you this week
+2026-10-19,Base-building,,Easy run (flexible day),8.1,move to whichever day suits you this week
+2026-10-20,Base-building,,Easy run (flexible day),8.1,move to whichever day suits you this week
+2026-10-21,Base-building,,Long run (flexible day),11.8,move to whichever day suits you this week
+2026-10-26,Base-building,,Easy run (flexible day),9.0,move to whichever day suits you this week
+2026-10-27,Base-building,,Easy run (flexible day),9.0,move to whichever day suits you this week
+2026-10-28,Base-building,,Long run (flexible day),13.0,move to whichever day suits you this week
+2026-11-02,Base-building,,Easy run (flexible day),7.8,move to whichever day suits you this week
+2026-11-03,Base-building,,Easy run (flexible day),7.8,move to whichever day suits you this week
+2026-11-04,Base-building,,Long run (flexible day),11.3,move to whichever day suits you this week
+2026-11-09,Base-building,,Easy run (flexible day),10.8,move to whichever day suits you this week
+2026-11-10,Base-building,,Easy run (flexible day),10.8,move to whichever day suits you this week
+2026-11-11,Base-building,,Long run (flexible day),15.5,move to whichever day suits you this week
+2026-11-16,Base-building,,Easy run (flexible day),11.9,move to whichever day suits you this week
+2026-11-17,Base-building,,Easy run (flexible day),11.9,move to whichever day suits you this week
+2026-11-18,Base-building,,Long run (flexible day),17.2,move to whichever day suits you this week
+2026-11-23,Base-building,,Easy run (flexible day),12.8,move to whichever day suits you this week
+2026-11-24,Base-building,,Easy run (flexible day),12.8,move to whichever day suits you this week
+2026-11-25,Base-building,,Long run (flexible day),18.5,move to whichever day suits you this week
+2026-11-30,Base-building,,Easy run (flexible day),11.0,move to whichever day suits you this week
+2026-12-01,Base-building,,Easy run (flexible day),11.0,move to whichever day suits you this week
+2026-12-02,Base-building,,Long run (flexible day),16.0,move to whichever day suits you this week
+2026-12-07,Base-building,,Easy run (flexible day),11.3,move to whichever day suits you this week
+2026-12-08,Base-building,,Easy run (flexible day),11.3,move to whichever day suits you this week
+2026-12-09,Base-building,,Easy run (flexible day),11.3,move to whichever day suits you this week
+2026-12-10,Base-building,,Long run (flexible day),16.0,move to whichever day suits you this week
+2026-12-14,Base-building,,Easy run (flexible day),12.0,move to whichever day suits you this week
+2026-12-15,Base-building,,Easy run (flexible day),12.0,move to whichever day suits you this week
+2026-12-16,Base-building,,Easy run (flexible day),12.0,move to whichever day suits you this week
+2026-12-17,Base-building,,Long run (flexible day),17.0,move to whichever day suits you this week
 2026-12-21,Endurance,17,Rest or cross-train,,
-2026-12-22,Endurance,17,General aerobic,8.5,
+2026-12-22,Endurance,17,General aerobic,9.5,
 2026-12-23,Endurance,17,Medium-long run,11.7,
 2026-12-24,Endurance,17,Rest or cross-train,,
-2026-12-25,Endurance,17,Recovery + optional strides,5.8,"6-8 x 100m relaxed strides optional, not required"
-2026-12-26,Endurance,17,Recovery,5.8,
-2026-12-27,Endurance,17,Long run,21.2,
+2026-12-25,Endurance,17,General aerobic,9.5,
+2026-12-26,Endurance,17,Rest or cross-train,,
+2026-12-27,Endurance,17,Long run,22.3,
 2026-12-28,Endurance,16,Rest or cross-train,,
-2026-12-29,Endurance,16,General aerobic,9.0,
+2026-12-29,Endurance,16,General aerobic,10.1,
 2026-12-30,Endurance,16,Medium-long run,12.3,
 2026-12-31,Endurance,16,Rest or cross-train,,
-2027-01-01,Endurance,16,Recovery + optional strides,6.2,"6-8 x 100m relaxed strides optional, not required"
-2027-01-02,Endurance,16,Recovery,6.2,
-2027-01-03,Endurance,16,Long run,22.4,
+2027-01-01,Endurance,16,General aerobic,10.1,
+2027-01-02,Endurance,16,Rest or cross-train,,
+2027-01-03,Endurance,16,Long run,23.5,
 2027-01-04,Endurance,15,Rest or cross-train,,
-2027-01-05,Endurance,15,General aerobic,9.4,
+2027-01-05,Endurance,15,General aerobic,10.6,
 2027-01-06,Endurance,15,Medium-long run,13.0,
 2027-01-07,Endurance,15,Rest or cross-train,,
-2027-01-08,Endurance,15,Recovery + optional strides,6.5,"6-8 x 100m relaxed strides optional, not required"
-2027-01-09,Endurance,15,Recovery,6.5,
-2027-01-10,Endurance,15,Long run,23.6,
+2027-01-08,Endurance,15,General aerobic,10.6,
+2027-01-09,Endurance,15,Rest or cross-train,,
+2027-01-10,Endurance,15,Long run,24.8,
 2027-01-11,Endurance,14,Rest or cross-train,,
-2027-01-12,Endurance,14,General aerobic,8.0,
+2027-01-12,Endurance,14,General aerobic,9.0,
 2027-01-13,Endurance,14,Medium-long run,11.0,
 2027-01-14,Endurance,14,Rest or cross-train,,
-2027-01-15,Endurance,14,Recovery + optional strides,5.5,"6-8 x 100m relaxed strides optional, not required"
-2027-01-16,Endurance,14,Recovery,5.5,
-2027-01-17,Endurance,14,Long run,20.0,
+2027-01-15,Endurance,14,General aerobic,9.0,
+2027-01-16,Endurance,14,Rest or cross-train,,
+2027-01-17,Endurance,14,Long run,21.0,
 2027-01-18,Endurance,13,Rest or cross-train,,
-2027-01-19,Endurance,13,General aerobic,10.4,
+2027-01-19,Endurance,13,General aerobic,11.7,
 2027-01-20,Endurance,13,Medium-long run,14.3,
 2027-01-21,Endurance,13,Rest or cross-train,,
-2027-01-22,Endurance,13,Recovery + optional strides,7.2,"6-8 x 100m relaxed strides optional, not required"
-2027-01-23,Endurance,13,Recovery,7.2,
-2027-01-24,Endurance,13,Long run,26.0,
+2027-01-22,Endurance,13,General aerobic,11.7,
+2027-01-23,Endurance,13,Rest or cross-train,,
+2027-01-24,Endurance,13,Long run,27.3,
 2027-01-25,LT+endurance (adapted: general aerobic),12,Rest or cross-train,,
-2027-01-26,LT+endurance (adapted: general aerobic),12,General aerobic,10.9,
+2027-01-26,LT+endurance (adapted: general aerobic),12,General aerobic,12.2,
 2027-01-27,LT+endurance (adapted: general aerobic),12,Medium-long run,15.0,
 2027-01-28,LT+endurance (adapted: general aerobic),12,Rest or cross-train,,
-2027-01-29,LT+endurance (adapted: general aerobic),12,Recovery + optional strides,7.5,"6-8 x 100m relaxed strides optional, not required"
-2027-01-30,LT+endurance (adapted: general aerobic),12,Recovery,7.5,
-2027-01-31,LT+endurance (adapted: general aerobic),12,Long run,27.2,
+2027-01-29,LT+endurance (adapted: general aerobic),12,General aerobic,12.2,
+2027-01-30,LT+endurance (adapted: general aerobic),12,Rest or cross-train,,
+2027-01-31,LT+endurance (adapted: general aerobic),12,Long run,28.6,
 2027-02-01,LT+endurance (adapted: general aerobic),11,Rest or cross-train,,
-2027-02-02,LT+endurance (adapted: general aerobic),11,General aerobic,11.4,
+2027-02-02,LT+endurance (adapted: general aerobic),11,General aerobic,12.8,
 2027-02-03,LT+endurance (adapted: general aerobic),11,Medium-long run,15.6,
 2027-02-04,LT+endurance (adapted: general aerobic),11,Rest or cross-train,,
-2027-02-05,LT+endurance (adapted: general aerobic),11,Recovery + optional strides,7.8,"6-8 x 100m relaxed strides optional, not required"
-2027-02-06,LT+endurance (adapted: general aerobic),11,Recovery,7.8,
-2027-02-07,LT+endurance (adapted: general aerobic),11,Long run,28.4,
+2027-02-05,LT+endurance (adapted: general aerobic),11,General aerobic,12.8,
+2027-02-06,LT+endurance (adapted: general aerobic),11,Rest or cross-train,,
+2027-02-07,LT+endurance (adapted: general aerobic),11,Long run,29.8,
 2027-02-08,LT+endurance (adapted: general aerobic),10,Rest or cross-train,,
-2027-02-09,LT+endurance (adapted: general aerobic),10,General aerobic,9.4,
+2027-02-09,LT+endurance (adapted: general aerobic),10,General aerobic,10.6,
 2027-02-10,LT+endurance (adapted: general aerobic),10,Medium-long run,13.0,
 2027-02-11,LT+endurance (adapted: general aerobic),10,Rest or cross-train,,
-2027-02-12,LT+endurance (adapted: general aerobic),10,Recovery + optional strides,6.5,"6-8 x 100m relaxed strides optional, not required"
-2027-02-13,LT+endurance (adapted: general aerobic),10,Recovery,6.5,
-2027-02-14,LT+endurance (adapted: general aerobic),10,Long run,23.6,
+2027-02-12,LT+endurance (adapted: general aerobic),10,General aerobic,10.6,
+2027-02-13,LT+endurance (adapted: general aerobic),10,Rest or cross-train,,
+2027-02-14,LT+endurance (adapted: general aerobic),10,Long run,24.8,
 2027-02-15,LT+endurance (adapted: general aerobic),9,Rest or cross-train,,
 2027-02-16,LT+endurance (adapted: general aerobic),9,General aerobic,12.3,
 2027-02-17,LT+endurance (adapted: general aerobic),9,Medium-long run,16.9,
@@ -127,12 +109,12 @@ date,phase,weeks_out,workout,distance_km,notes
 2027-03-06,LT+endurance (adapted: general aerobic),7,Recovery,9.1,
 2027-03-07,LT+endurance (adapted: general aerobic),7,Long run,33.2,
 2027-03-08,Race preparation,6,Rest or cross-train,,
-2027-03-09,Race preparation,6,General aerobic,11.0,
+2027-03-09,Race preparation,6,General aerobic,12.4,
 2027-03-10,Race preparation,6,Medium-long run,15.2,
 2027-03-11,Race preparation,6,Rest or cross-train,,
-2027-03-12,Race preparation,6,Recovery + optional strides,7.6,"6-8 x 100m relaxed strides optional, not required"
-2027-03-13,Race preparation,6,Recovery,7.6,
-2027-03-14,Race preparation,6,Long run,27.6,"include ~15.2 km at marathon pace, rest easy"
+2027-03-12,Race preparation,6,General aerobic,12.4,
+2027-03-13,Race preparation,6,Rest or cross-train,,
+2027-03-14,Race preparation,6,Long run,29.0,"include ~16.0 km at marathon pace, rest easy"
 2027-03-15,Race preparation,5,Rest or cross-train,,
 2027-03-16,Race preparation,5,General aerobic,14.2,
 2027-03-17,Race preparation,5,Medium-long run,19.6,
@@ -148,30 +130,30 @@ date,phase,weeks_out,workout,distance_km,notes
 2027-03-27,Race preparation,4,Recovery,9.8,
 2027-03-28,Race preparation,4,Long run,35.6,"include ~19.6 km at marathon pace, rest easy"
 2027-03-29,Taper,3,Rest or cross-train,,
-2027-03-30,Taper,3,General aerobic,10.7,
+2027-03-30,Taper,3,General aerobic,12.1,
 2027-03-31,Taper,3,Medium-long run,14.7,
 2027-04-01,Taper,3,Rest or cross-train,,
-2027-04-02,Taper,3,Recovery + optional strides,7.4,"6-8 x 100m relaxed strides optional, not required"
-2027-04-03,Taper,3,Recovery,7.4,
-2027-04-04,Taper,3,Long run,26.8,"include ~14.7 km at marathon pace, rest easy"
+2027-04-02,Taper,3,General aerobic,12.1,
+2027-04-03,Taper,3,Rest or cross-train,,
+2027-04-04,Taper,3,Long run,28.1,"include ~15.5 km at marathon pace, rest easy"
 2027-04-05,Taper,2,Rest or cross-train,,
-2027-04-06,Taper,2,General aerobic,8.5,
+2027-04-06,Taper,2,General aerobic,9.5,
 2027-04-07,Taper,2,Medium-long run,11.7,
 2027-04-08,Taper,2,Rest or cross-train,,
-2027-04-09,Taper,2,Recovery + optional strides,5.8,"6-8 x 100m relaxed strides optional, not required"
-2027-04-10,Taper,2,Recovery,5.8,
-2027-04-11,Taper,2,Long run,21.2,"include ~11.7 km at marathon pace, rest easy"
+2027-04-09,Taper,2,General aerobic,9.5,
+2027-04-10,Taper,2,Rest or cross-train,,
+2027-04-11,Taper,2,Long run,22.3,"include ~12.3 km at marathon pace, rest easy"
 2027-04-12,Taper,1,Rest or cross-train,,
-2027-04-13,Taper,1,General aerobic,6.4,
-2027-04-14,Taper,1,Medium-long run,8.8,
+2027-04-13,Taper,1,Rest or cross-train,,
+2027-04-14,Taper,1,Medium-long run,12.8,
 2027-04-15,Taper,1,Rest or cross-train,,
-2027-04-16,Taper,1,Recovery + optional strides,4.4,"6-8 x 100m relaxed strides optional, not required"
-2027-04-17,Taper,1,Recovery,4.4,
+2027-04-16,Taper,1,General aerobic,11.2,
+2027-04-17,Taper,1,Rest or cross-train,,
 2027-04-18,Taper,1,Long run,16.0,"include ~8.8 km at marathon pace, rest easy"
 2027-04-19,Taper,0,Rest or cross-train,,
-2027-04-20,Taper,0,General aerobic,5.0,
-2027-04-21,Taper,0,Medium-long run,6.8,
+2027-04-20,Taper,0,Rest or cross-train,,
+2027-04-21,Taper,0,Medium-long run,9.9,
 2027-04-22,Taper,0,Rest or cross-train,,
-2027-04-23,Taper,0,Recovery + optional strides,3.4,"6-8 x 100m relaxed strides optional, not required"
-2027-04-24,Taper,0,Recovery,3.4,
+2027-04-23,Taper,0,General aerobic,8.7,
+2027-04-24,Taper,0,Rest or cross-train,,
 2027-04-25,Taper,0,Goal marathon,42.2,race day

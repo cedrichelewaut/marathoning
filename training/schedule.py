@@ -40,19 +40,42 @@ class Week:
         return sum(d.distance_km or 0 for d in self.days)
 
 
-# Monday-indexed weekly skeleton for the 18-week race-specific block.
-# (workout, fraction of weekly MP/long-run emphasis) — distances are derived
-# from the week's total target mileage using these fixed fractions, which
-# mirror the book's day-to-day balance.
-_SKELETON = {
-    0: ("Rest or cross-train", 0.0),       # Monday
-    1: ("General aerobic", 0.16),          # Tuesday
-    2: ("Medium-long run", 0.22),          # Wednesday
-    3: ("Rest or cross-train", 0.0),       # Thursday
-    4: ("Recovery + optional strides", 0.11),  # Friday
-    5: ("Recovery", 0.11),                 # Saturday
-    6: ("Long run", 0.40),                 # Sunday (MP segment added in race-prep block)
+# Monday-indexed weekly skeletons, keyed by how many days a week you
+# actually run. Only weeks within HIGH_MILEAGE_RATIO of peak mileage use
+# the 5-run skeleton; everything else runs 3-4x/week with bigger individual
+# runs to still hit the weekly target, since 5 runs/week isn't sustainable
+# except in the heaviest weeks.
+_SKELETON_3 = {
+    2: ("Medium-long run", 0.32),   # Wednesday
+    4: ("General aerobic", 0.28),   # Friday
+    6: ("Long run", 0.40),          # Sunday
 }
+_SKELETON_4 = {
+    1: ("General aerobic", 0.18),   # Tuesday
+    2: ("Medium-long run", 0.22),   # Wednesday
+    4: ("General aerobic", 0.18),   # Friday
+    6: ("Long run", 0.42),          # Sunday
+}
+_SKELETON_5 = {
+    1: ("General aerobic", 0.16),          # Tuesday
+    2: ("Medium-long run", 0.22),           # Wednesday
+    4: ("Recovery + optional strides", 0.11),  # Friday
+    5: ("Recovery", 0.11),                  # Saturday
+    6: ("Long run", 0.40),                  # Sunday
+}
+
+HIGH_MILEAGE_RATIO = 0.85  # only weeks at/above this fraction of peak get 5 runs
+MID_MILEAGE_RATIO = 0.55   # above this, 4 runs; below, 3 runs
+
+
+def _skeleton_for_week(total_km: float, peak_km: float) -> dict:
+    ratio = total_km / peak_km if peak_km else 0
+    if ratio >= HIGH_MILEAGE_RATIO:
+        return _SKELETON_5
+    if ratio >= MID_MILEAGE_RATIO:
+        return _SKELETON_4
+    return _SKELETON_3
+
 
 _RACE_PREP_START_WEEKS_OUT = 6  # from here the long/MP run carries marathon-pace miles
 _TAPER_START_WEEKS_OUT = 3
@@ -96,7 +119,9 @@ def generate_18wk_plan(plan_start: datetime.date, race_date: datetime.date,
         phase = _phase_for_week(weeks_out)
         total_km = weekly_totals[w]
         week = Week(index=weeks_out, phase=phase, start_date=week_start)
-        for offset, (workout, frac) in _SKELETON.items():
+        skeleton = _skeleton_for_week(total_km, peak_km)
+        for offset in range(7):
+            workout, frac = skeleton.get(offset, ("Rest or cross-train", 0.0))
             date = week_start + datetime.timedelta(days=offset)
             dist = round(total_km * frac, 1) if frac else None
             notes = ""
@@ -115,10 +140,13 @@ def generate_18wk_plan(plan_start: datetime.date, race_date: datetime.date,
 
 
 def generate_base_building(start_date: datetime.date, end_before: datetime.date,
-                            start_km: float, target_km: float) -> list[Week]:
+                            start_km: float, target_km: float, peak_km: float) -> list[Week]:
     """Flexible, easy-only base-building weeks before the structured block.
-    No fixed workout days: just a weekly mileage target split across 4-5
-    easy runs plus one slightly longer run, left flexible day-to-day."""
+    No fixed workout days: just a weekly mileage target split across 3-4
+    easy runs plus one slightly longer run, left flexible day-to-day. Run
+    count follows the same mileage-based thresholds as the race-specific
+    block, so this never asks for more than 4 runs (base weeks never reach
+    peak mileage, so the 5-run tier never triggers here)."""
     n_weeks = max(0, (end_before - start_date).days // 7)
     weeks: list[Week] = []
     for w in range(n_weeks):
@@ -128,10 +156,14 @@ def generate_base_building(start_date: datetime.date, end_before: datetime.date,
         if (w + 1) % 4 == 0:
             total_km = round(total_km * 0.80)
         week = Week(index=None, phase="Base-building", start_date=week_start)
-        long_run = round(total_km * 0.28, 1)
-        remaining = total_km - long_run
-        per_run = round(remaining / 4, 1)
-        plan = [("Easy run (flexible day)", per_run)] * 4 + [("Long run (flexible day)", long_run)]
+        n_runs = len(_skeleton_for_week(total_km, peak_km))
+        n_easy = n_runs - 1
+        # Long run must be the biggest single run, so give it a bigger share
+        # the fewer easy runs there are to spread the rest across.
+        long_frac = 0.42 if n_easy <= 2 else 0.32
+        long_run = round(total_km * long_frac, 1)
+        per_run = round((total_km - long_run) / n_easy, 1)
+        plan = [("Easy run (flexible day)", per_run)] * n_easy + [("Long run (flexible day)", long_run)]
         for offset, (workout, dist) in enumerate(plan):
             date = week_start + datetime.timedelta(days=offset)
             week.days.append(Day(date=date, workout=workout, distance_km=dist,
