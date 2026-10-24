@@ -1,0 +1,26 @@
+# Copy over config.yaml and edit. Then:
+#   python3 cli.py generate-schedule
+#   python3 cli.py sync-site
+# plan_18wk_start must be the Monday 17 weeks before the Monday of race week.
+
+site:
+  title: Marathon training
+  pages_url: https://<user>.github.io/<repo>/
+  repo_url: https://github.com/<user>/<repo>
+
+race:
+  name: City Marathon
+  date: 2027-10-03
+
+goal:
+  # min:sec per km
+  pace_per_km: "5:00"
+
+training:
+  plan_18wk_start: 2027-05-31
+  peak_weekly_km: 89
+  race_block_start_km: 53
+  base_building_start_km: 18
+  base_building_final_total_km: 38
+  base_building_final_long_km: 17
+  avoid_fast_running: true

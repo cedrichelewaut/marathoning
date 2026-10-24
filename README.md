@@ -1,163 +1,106 @@
-# Marathoning
+# Running tracker
 
-Training setup for Hamburg Marathon, 25 April 2027.
+A static training board. A config file builds the plan, a CSV holds the runs you have logged, and GitHub Actions publishes the page. No server and no API secret.
 
-Live schedule: https://cedrichelewaut.github.io/marathoning/
+This repo’s board: [https://cedrichelewaut.github.io/running-tracker/](https://cedrichelewaut.github.io/running-tracker/)
 
-The page compares the plan with `data/strava_runs.csv`. Every week shows
-planned km versus actual km beside one progress bar. The bar is **green**
-when the week is done or on pace, **yellow** when it is behind and the
-remaining kilometres still fit in the days left (about 20 km a day), and
-**red** when they do not, including a finished week under the done bar and
-a week with less than two days left that is still a long way short. Weeks
-that have not started stay **grey**.
+Embed the two phase bars in an iframe from [progress.html](https://cedrichelewaut.github.io/running-tracker/progress.html).
 
-**This week** is open, and the same comparison is in the expanded rows of
-**Completed**. A session is the run and its distance, for example
-`Easy run · 6 km`. Logged runs show their distance and time. Neither is
-tied to a day; the week header keeps the date range. Runs are matched
-within the week: the longest run fills the planned long run, and the other
-runs fill the closest remaining distances. A matched run shows a gap such as `+1 km`,
-`-1 km`, or `on plan` (within half a kilometre). Extra runs are
-**Additional**. A session with no run is **Missed** once the week is over,
-and **To do** until then. **Completed** stays collapsed; its header is the
-actual-vs-planned total, e.g. `52/54 km completed, 4/4 weeks`. **Coming
-up** is the rest of the plan. The book file stays local (see `.gitignore`).
+Source: [https://github.com/cedrichelewaut/running-tracker](https://github.com/cedrichelewaut/running-tracker)
 
-## Setup
+## Use this as a template
 
-```
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+1. Fork the repo. After the template setting is on, **Use this template** does the same thing.
+2. Edit `config.yaml`. Every field is listed below. `config.example.yaml` is a blank start.
+3. Rebuild the plan and the page:
 
-## Schedule
+   ```
+   python3 -m venv venv && source venv/bin/activate
+   pip install -r requirements.txt
+   python3 cli.py generate-schedule
+   python3 cli.py sync-site
+   ```
 
-`config.yaml` holds the race date, goal pace, and mileage targets. Edit it,
-then regenerate:
+4. Replace `data/strava_runs.csv`. The file in this repo is the original log. A fresh file can be just the header, or the sample row in `data/strava_runs.example.csv`.
+5. Enable GitHub Pages: **Settings → Pages → Build and deployment → Source: GitHub Actions**. On a fork, enable Actions if GitHub has them paused, and approve the `github-pages` environment if it asks.
+6. Push to `main`.
 
-```
-python cli.py generate-schedule
-```
+Your board is `https://<user>.github.io/<repo>/`. The embed is `progress.html` on that same site. Put those two URLs in `site.pages_url` and `site.repo_url`.
 
-Writes `data/schedule.csv`: flexible, easy-only base-building from whenever
-you run this up to `training.plan_18wk_start`, then an 18-week block
-structured like *Advanced Marathoning* chapter 9 ("Up to 55 Miles per
-Week") — one long run, one medium-long run, rest days, mileage ramping to
-`peak_weekly_km` with a lighter week every 4th. Every LT/VO2max-interval
-and hill-sprint session from the book is replaced with general-aerobic or
-marathon-pace running, since the goal is to avoid fast running. Strides are
-kept but marked optional.
+No repository secrets. Both workflows use the built-in `GITHUB_TOKEN`.
 
-## Logging actual runs
+## Configuration
 
-Actual kilometres on the site come from one tracked file, `data/strava_runs.csv`.
-It holds run rows only: no client secret, no token, no refresh token.
-Strava has required a subscription for API apps since June 2026, so nothing
-here calls the Strava API. `training/strava.py` is an unused client kept in
-the tree; the generator does not import it, and CI does not need
-`data/strava_auth.json`, `data/runs.csv`, or `books/`.
+`site.title` is the heading on the board. The browser title is `<race.name> training`. `site.pages_url` and `site.repo_url` are the public links for this project. They are not printed on the page.
 
-A morning updater appends new rows to `data/strava_runs.csv` on `main` through
-the GitHub API (it does not run Python). That push triggers
-`.github/workflows/regenerate-site.yml`, which runs `python cli.py sync-site`
-and, if the totals or the page changed, commits `data/weekly_status.csv` and
-`docs/` back to `main`. The same workflow then deploys GitHub Pages from the
-regenerated `docs/` directory. A `GITHUB_TOKEN` push does not start
-`pages.yml`, so the deploy step here is what publishes the page after the
-commit. The workflow uses `contents: write`, `pages: write`, and
-`id-token: write`. It does not stage `data/strava_runs.csv`, so the commit
-cannot start the workflow again. Deploying Pages does not create another
-commit.
+`race.name` and `race.date` are the race. `goal.pace_per_km` is the goal pace, `min:sec` per km. Other paces are derived from it.
 
-### `data/strava_runs.csv`
+`training.plan_18wk_start` is the Monday of week 1. It is 17 weeks before the Monday of the week that contains `race.date`. Earlier weeks are base building.
 
-Columns, in this order:
+`training.peak_weekly_km` is the peak week of the 18-week block. `training.race_block_start_km` is that block’s first week. `training.base_building_start_km` is the first base week. `training.base_building_final_total_km` and `training.base_building_final_long_km` are the weekly distance and long run to reach by the last base week.
+
+`training.avoid_fast_running` replaces LT, VO2max, and hill sessions with general aerobic or marathon-pace running. Optional strides stay.
+
+After editing, run `python3 cli.py generate-schedule` and commit `data/schedule.csv`.
+
+## Plan and phases
+
+Base building is easy running on flexible days, from `plan_18wk_start` backward. The 18-week block is the race-specific plan: week 1 through week 18, ending on race week. The board labels the two parts **Base building** and **Marathon training · 18 weeks**, inside Completed, This week, and Coming up.
+
+The 18-week mileage shape lives in `training/schedule.py`. It follows the progression in *Advanced Marathoning* (Pfitzinger & Douglas), chapter 9, “Up to 55 miles per week”, scaled to `peak_weekly_km`. The book file itself is not in the repo. `books/` is gitignored.
+
+Each week shows planned km against logged km. The bar is green when the week is done or on pace, yellow when it is behind and the remainder still fits in the days left (about 20 km a day), and red when it does not. Weeks that have not started stay grey. A finished week counts as done at 85% of its planned distance.
+
+Runs match inside the week, not to a calendar day. The longest run fills the long session. The other runs fill the closest remaining distances. A match is `on plan` within half a kilometre, otherwise `+1 km` or `-1 km`. Extra runs are **Additional**. A session with no run is **To do** until the week ends, then **Missed**.
+
+The two bars at the top, and on `progress.html`, are the same split: logged km against planned km for base building, and for the 18-week block, plus how many finished weeks hit the 85% bar.
+
+## Getting your run data
+
+The code that reads a Strava account directly is not in this repo. Part of that integration is proprietary.
+
+Runs here come from Strava. Strava has required a subscription for API apps since 2026, so this project does not call the API. A daily job reads the Strava training log and appends new rows to `data/strava_runs.csv` on `main`. That push starts **Regenerate site from logged runs**, which rebuilds `docs/index.html` and `docs/progress.html` and deploys Pages.
+
+`training/strava.py` is an unused client. Nothing in the generator or the workflows imports it. Do not commit `data/strava_auth.json`.
+
+### CSV
 
 | Column | Format |
 | --- | --- |
-| `date` | `YYYY-MM-DD`, the local date of the run |
-| `name` | Activity title. Quote the field if it contains a comma. |
-| `distance_km` | Kilometres as a decimal, e.g. `8.02` |
-| `moving_time` | `h:mm:ss`, e.g. `0:46:12` |
-| `strava_activity_id` | Strava activity id. This is the dedupe key. |
+| `date` | `YYYY-MM-DD` |
+| `name` | Activity title. Quote it if it contains a comma. |
+| `distance_km` | Kilometres, e.g. `8.02` |
+| `moving_time` | `h:mm:ss` |
+| `strava_activity_id` | Dedupe key. The first row wins. |
 
 ```csv
 date,name,distance_km,moving_time,strava_activity_id
 2026-10-22,Morning run,8.02,0:46:12,12345678901
 ```
 
-Append one row per activity. Repeating a `strava_activity_id` is safe: the
-first row wins and the distance is counted once. A week counts toward the
-collapsed Completed header (`52/54 km completed, 4/4 weeks`) when its actual
-distance is at least 85% of the plan, the same on-track bar as
-`python cli.py status`.
+### Other ways to add runs
 
-Regenerate the totals and the page:
+Edit `data/strava_runs.csv` by hand and push to `main`.
+
+Or import a Strava or Garmin export locally:
 
 ```
-python cli.py sync-site
+python3 cli.py import-runs path/to/export.csv --source strava
+python3 cli.py import-runs path/to/export.csv --source garmin
 ```
 
-That rewrites `data/weekly_status.csv`, `docs/index.html`, and the embed
-`docs/progress.html` from `data/schedule.csv` plus `data/strava_runs.csv`.
-Running it again with the
-same file produces the same output. You can also run it by hand from the
-Actions tab (workflow **Regenerate site from logged runs**).
+That writes gitignored `data/runs.csv` only. Copy the rows you want into `data/strava_runs.csv` to publish them.
 
-`python cli.py status` reads the same file.
-
-### Manual export (optional, local only)
+## Commands
 
 ```
-python cli.py import-runs path/to/export.csv --source strava   # or garmin
+python3 cli.py generate-schedule   # config.yaml -> data/schedule.csv
+python3 cli.py sync-site           # CSV -> weekly totals, index, and progress.html
+python3 cli.py status              # this week; --week -1 or --week 2 to move
+python3 cli.py predict --time 19:30 --distance 5
+python3 cli.py predict --goal-pace 4:30
 ```
 
-This appends to gitignored `data/runs.csv` and does not change the site.
-To publish a run, add a row to `data/strava_runs.csv` and run `sync-site`.
+`sync-site` is safe to run twice. Pushing `data/strava_runs.csv` to `main` runs it again in Actions and deploys the result. Any other push to `main` deploys through **Deploy schedule to Pages**.
 
-## Checking progress
-
-```
-python cli.py status            # current week
-python cli.py status --week -1  # last week
-python cli.py status --week 2   # two weeks from now
-```
-
-Compares actual vs planned weekly distance and long-run distance.
-
-## Predicting finish time
-
-From a recent race or hard effort:
-
-```
-python cli.py predict --time 19:30 --distance 5
-```
-
-From just your goal pace (training paces only, no result needed):
-
-```
-python cli.py predict --goal-pace 4:30
-```
-
-Uses Jack Daniels' VDOT formula plus a Riegel-formula cross-check.
-
-## Publishing the schedule to GitHub Pages
-
-```
-python cli.py sync-site
-git add data/strava_runs.csv data/weekly_status.csv docs/index.html docs/progress.html
-git commit -m "Update logged runs and site"
-git push
-```
-
-Pushing to `main` triggers `.github/workflows/pages.yml`, which runs
-`sync-site` on a clean checkout (no book file, no private run export, no API
-token) and deploys `docs/`. A push that changes `data/strava_runs.csv` also
-triggers `.github/workflows/regenerate-site.yml`. That workflow regenerates
-the page, commits `data/weekly_status.csv` and `docs/` when they differ,
-then deploys GitHub Pages from those files. The commit cannot retrigger
-either workflow, because it is pushed with `GITHUB_TOKEN` and it does not
-touch `data/strava_runs.csv`. `data/runs.csv`, `data/strava_auth.json`, and
-`books/` stay gitignored.
+There is no license file yet.

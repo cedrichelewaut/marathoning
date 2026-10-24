@@ -43,6 +43,13 @@ def _as_date(value) -> datetime.date:
     return value if isinstance(value, datetime.date) else datetime.date.fromisoformat(value)
 
 
+def _site_title(cfg: dict) -> str:
+    """Board heading. config.yaml site.title, or the generic default."""
+    site_cfg = cfg.get("site") or {}
+    title = str(site_cfg.get("title") or "").strip()
+    return title or "Marathon training"
+
+
 def cmd_generate_schedule(args: argparse.Namespace) -> None:
     cfg = load_config()
     race_date = _as_date(cfg["race"]["date"])
@@ -157,6 +164,7 @@ def cmd_render_site(args: argparse.Namespace) -> None:
         race_date=_as_date(cfg["race"]["date"]),
         goal_pace=cfg["goal"]["pace_per_km"],
         runs_path=STRAVA_RUNS_PATH,
+        site_title=_site_title(cfg),
     )
     with open(SITE_OUT_PATH, "w") as f:
         f.write(html_out)

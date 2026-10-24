@@ -164,7 +164,17 @@ class PageTests(unittest.TestCase):
             "Hamburg Marathon", datetime.date(2027, 4, 25), "4:30",
             today=datetime.date(2026, 10, 24),
         )
-        self.assertIn("Marathon training", page)
+        self.assertIn("<h1>Marathon training</h1>", page)
+        self.assertIn("<title>Hamburg Marathon training</title>", page)
+        titled = site.render(
+            str(ROOT / "data" / "schedule.csv"),
+            str(ROOT / "data" / "weekly_status.csv"),
+            "Hamburg Marathon", datetime.date(2027, 4, 25), "4:30",
+            today=datetime.date(2026, 10, 24),
+            site_title="City training",
+        )
+        self.assertIn("<h1>City training</h1>", titled)
+        self.assertIn("<title>Hamburg Marathon training</title>", titled)
         self.assertIn("Completed", page)
         self.assertIn("This week", page)
         self.assertIn("Coming up", page)

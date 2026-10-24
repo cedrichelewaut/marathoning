@@ -1,44 +1,40 @@
-# Marathoning schedule config. Edit and re-run `python cli.py generate-schedule`.
+# Training board config. Edit this, then:
+#   python3 cli.py generate-schedule
+#   python3 cli.py sync-site
+# A fork keeps its own copy of this file. See config.example.yaml for a blank start.
+
+site:
+  # Heading on the board. The browser title is "<race name> training".
+  title: Marathon training
+  # Public URLs for this repo. Not printed on the page. A fork should
+  # replace both; Pages will be https://<user>.github.io/<repo>/
+  pages_url: https://cedrichelewaut.github.io/running-tracker/
+  repo_url: https://github.com/cedrichelewaut/running-tracker
 
 race:
   name: Hamburg Marathon
   date: 2027-04-25
 
 goal:
-  # Goal marathon pace in min:sec per km. 4:30/km = ~3:09:53 marathon.
+  # Goal marathon pace, min:sec per km.
   pace_per_km: "4:30"
 
 training:
-  # Monday the 18-week, book-structured race-specific plan should start.
-  # Anything between today and this date is base-building (flexible, easy
-  # mileage build-up, no structured workouts).
+  # Monday of week 1 of the 18-week block. Count 18 weeks back from the
+  # race week (the Monday of the week that contains race.date). Weeks
+  # before this date are base building.
   plan_18wk_start: 2026-12-21
-  # Peak weekly mileage for the 18-week block (km): 55 mi/wk, the top of
-  # the book's "Up to 55 Miles per Week" track.
+  # Peak weekly distance of the 18-week block, in km.
   peak_weekly_km: 89
-  # What the 18-week block itself starts at (km): 33 mi/wk, the book's own
-  # number. The 18-week block always follows this exact book progression
-  # (race_block_start_km -> peak_weekly_km), unmodified.
+  # Weekly distance at the start of the 18-week block, in km. The block
+  # ramps from this value to peak_weekly_km.
   race_block_start_km: 53
-  # Base-building starting weekly volume (km) for the very first week,
-  # coming off a break - this ramps up at a conservative, capped rate,
-  # separately from the book's own 18-week progression above.
+  # First base-building week, in km. Later weeks ramp toward the two
+  # targets below.
   base_building_start_km: 18
-  # The book's own prerequisite before starting the 18-week block: "at
-  # least 25 mi/wk (40 km)" total, with a long run "close in length to"
-  # the first week's 12 mi (19 km), both achieved in the last month
-  # beforehand (40 km / 19 km). These are set 10% lighter than that, by
-  # request, to keep the on-ramp a bit easier - 38 km total lands just
-  # under the book's 40 km floor, 17 km long run just under its ~19 km.
+  # Weekly distance and long run to reach by the last base week, in km.
   base_building_final_total_km: 38
   base_building_final_long_km: 17
-  # All non-marathon-pace paces (long run, medium-long, general aerobic,
-  # recovery) are derived directly from goal.pace_per_km, as percentages
-  # slower than it (see _PACE_PCT_SLOWER in training/schedule.py) - this
-  # is how the book itself defines them (chapter 1, table 1.1), not a
-  # separate pace estimate. Used for base-building too, same system.
-  # If true (your preference), replace every LT/VO2max/hill-sprint session
-  # with marathon-pace or general-aerobic running. Short strides are kept
-  # but marked optional since they're brief enough not to count as real
-  # "fast running".
+  # Replace LT, VO2max, and hill sessions with general aerobic or
+  # marathon-pace running. Optional strides stay in the plan.
   avoid_fast_running: true

@@ -955,7 +955,8 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
            race_date: datetime.date, goal_pace: str,
            today: datetime.date | None = None,
            runs_path: str | None = None,
-           now: datetime.datetime | None = None) -> str:
+           now: datetime.datetime | None = None,
+           site_title: str = "Marathon training") -> str:
     brussels_now = _resolve_now(now)
     today = today or brussels_now.date()
     updated = last_updated_label(brussels_now)
@@ -981,7 +982,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
   <div class="wrap">
     <header class="top">
       <div>
-        <h1>Marathon training</h1>
+        <h1>{_esc(site_title)}</h1>
         <p class="subtitle">{subtitle}</p>
         <p class="updated">{_esc(updated)}</p>
       </div>
