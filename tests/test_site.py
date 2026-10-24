@@ -83,55 +83,48 @@ class PageTests(unittest.TestCase):
 
         self.assertIn("28/40 km completed, 1/2 weeks", page)
         self.assertIn("5/20 km this week", page)
-        self.assertIn(">Done<", page)
-        self.assertIn(">Behind<", page)
-        self.assertIn(">Not started<", page)
-        self.assertNotIn(">Stuck<", page)
-        self.assertNotIn(">Working on it<", page)
-        self.assertNotIn(">Planned<", page)
+        self.assertIn('class="fill green" style="width:90%"', page)
+        self.assertIn('class="fill red" style="width:50%"', page)
+        self.assertIn('class="fill yellow" style="width:25%"', page)
+        self.assertNotIn('class="pill', page)
+        self.assertNotIn(">Done<", page)
+        self.assertNotIn(">On track<", page)
+        self.assertNotIn(">Not started<", page)
+        self.assertNotIn(">Status<", page)
         self.assertIn("Oct 26 – Nov 1 · Race", page)
         self.assertIn("0/30 km", page)
         self.assertIn("Logged run", page)
-        self.assertIn(">On track<", page)
         self.assertIn(">Missed<", page)
         self.assertIn(">To do<", page)
         self.assertEqual(page.count('<details class="item" open>'), 1)
-        # Future weeks stay Not started even though the status file marks them behind.
         upcoming = page.split('class="group upcoming"', 1)[1]
-        self.assertNotIn(">Behind<", upcoming)
+        self.assertNotIn("fill red", upcoming)
+        self.assertNotIn("fill yellow", upcoming)
+        self.assertNotIn("fill green", upcoming)
         self.assertNotIn(">Missed<", upcoming)
-        self.assertIn(">Not started<", upcoming)
         self.assertIn(">To do<", upcoming)
         self.assertIn("width:90%", page)
         self.assertIn("width:50%", page)
 
-    def test_status_pills_follow_the_plan(self) -> None:
-        today = datetime.date(2026, 10, 19)  # Monday
-        upcoming = site.WeekView(
-            datetime.date(2026, 10, 26), "Base-building", 20, 0, 8, 0, bucket="upcoming",
-        )
-        done = site.WeekView(
-            datetime.date(2026, 9, 28), "Base-building", 20, 18, 10, 10, bucket="completed",
-        )
-        behind = site.WeekView(
-            datetime.date(2026, 10, 5), "Base-building", 20, 10, 10, 4, bucket="completed",
-        )
-        on_track = site.WeekView(
-            datetime.date(2026, 10, 19), "Base-building", 20, 0, 8, 0,
-            days=[{"date": "2026-10-21", "workout": "Long run", "distance_km": "8"}],
-            bucket="this-week",
-        )
-        self.assertEqual(site.status_for(upcoming, today), ("not-started", "Not started"))
-        self.assertEqual(site.status_for(done, today), ("done", "Done"))
-        self.assertEqual(site.status_for(behind, today), ("behind", "Behind"))
-        self.assertEqual(site.status_for(on_track, today), ("on-track", "On track"))
-        # A session can move to another day, so the open week stays On track.
-        shifted = site.WeekView(
-            datetime.date(2026, 10, 19), "Base-building", 20, 0, 8, 0,
-            days=[{"date": "2026-10-19", "workout": "Easy run", "distance_km": "6"}],
-            bucket="this-week",
-        )
-        self.assertEqual(site.status_for(shifted, datetime.date(2026, 10, 24)), ("on-track", "On track"))
+    def test_progress_bar_color_follows_pace(self) -> None:
+        monday = datetime.date(2026, 10, 19)
+        saturday = datetime.date(2026, 10, 24)
+        sunday = datetime.date(2026, 10, 25)
+
+        def week(start, planned, actual, bucket):
+            return site.WeekView(start, "Base-building", planned, actual, 8, 0, bucket=bucket)
+
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 10, 26), 25, 0, "upcoming"), monday), "neutral")
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 9, 28), 20, 18, "completed"), saturday), "green")
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 10, 5), 20, 10, "completed"), saturday), "red")
+        # Monday, nothing elapsed yet: still on pace.
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 10, 19), 20, 0, "this-week"), monday), "green")
+        # Saturday with nothing logged: behind, and two days can still cover 25 km.
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 10, 19), 25, 0, "this-week"), saturday), "yellow")
+        # Sunday with 25 km still to go is more than one day can cover.
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 10, 19), 25, 0, "this-week"), sunday), "red")
+        # Sunday with 13 km left is short of the line, and still runnable.
+        self.assertEqual(site.progress_tone(week(datetime.date(2026, 10, 19), 25, 12, "this-week"), sunday), "yellow")
 
     def test_real_schedule_renders_three_groups(self) -> None:
         page = site.render(
@@ -145,6 +138,9 @@ class PageTests(unittest.TestCase):
         self.assertIn("This week", page)
         self.assertIn("Coming up", page)
         self.assertIn("km completed", page)
+        self.assertIn("fill yellow", page)
+        self.assertIn("fill red", page)
+        self.assertNotIn('class="pill', page)
         self.assertNotIn("strava_auth", page)
         self.assertNotIn("refresh_token", page)
 
@@ -179,7 +175,7 @@ class StravaRunsFeedTheBoardTests(unittest.TestCase):
             )
         # 15.5 km in the week of Oct 5 (planned 17) clears 85%. Oct 19 is this week.
         self.assertIn("15.5/17 km completed, 1/1 week", page)
-        self.assertIn(">Done<", page)
+        self.assertIn("fill green", page)
         self.assertIn("0/20 km this week", page)
         self.assertIn("Morning", page)
         self.assertIn("Treadmill", page)
