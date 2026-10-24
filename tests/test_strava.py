@@ -121,7 +121,7 @@ class RepoGuardTests(unittest.TestCase):
         self.assertIn("python cli.py sync-site", text)
         self.assertIn("actions/upload-pages-artifact@v3", text)
         self.assertIn("actions/deploy-pages@v4", text)
-        self.assertIn("git add -- data/weekly_status.csv docs/index.html docs/.nojekyll", text)
+        self.assertIn("git add -- data/weekly_status.csv docs/index.html docs/progress.html docs/.nojekyll", text)
         self.assertNotIn("git add -A", text)
         self.assertNotIn("git add .", text)
         deploy = loaded["jobs"]["deploy"]

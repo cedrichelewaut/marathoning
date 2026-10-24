@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Training progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; background: transparent;
+  color: #323338;
+  font-family: Figtree, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px; line-height: 1.3;
+}
+.phases {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0;
+}
+.phasebar {
+  min-width: 0; background: #f5f6f8; border-left: 6px solid #c4c4c4;
+  border-radius: 0 6px 6px 0; padding: 8px 10px 7px;
+}
+.phasebar.plan { border-left-color: #ff642e; background: #fff4ee; }
+.phasebar-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 2px 12px; flex-wrap: wrap; min-width: 0;
+}
+.phasebar-name {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.1px; color: #676879;
+  min-width: 0;
+}
+.phasebar.plan .phasebar-name { color: #323338; }
+.phasebar-km {
+  margin-left: auto; font-size: 13px; font-weight: 600; color: #323338;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.phasebar-track {
+  margin-top: 6px; height: 8px; background: #e6e9ef;
+  border-radius: 999px; overflow: hidden;
+}
+.phasebar.plan .phasebar-track { background: #ffd0c2; }
+.phasebar-fill { display: block; height: 100%; border-radius: 999px; background: #676879; }
+.phasebar.plan .phasebar-fill { background: #ff642e; }
+.phasebar-weeks { margin: 3px 0 0; color: #676879; font-size: 12px; line-height: 1.2; }
+@media (max-width: 640px) {
+  .phases { grid-template-columns: 1fr; gap: 6px; }
+}
+</style>
+</head>
+<body>
+<section class="phases" aria-label="Plan progress">
+<div class="phasebar base"><div class="phasebar-head"><span class="phasebar-name">Base building</span><span class="phasebar-km">61.2 km / 311 km</span></div><div class="phasebar-track" role="img" aria-label="Base building, 61.2 km / 311 km"><span class="phasebar-fill" style="width:19.7%"></span></div><p class="phasebar-weeks" title="Finished weeks at 85% of the planned distance">2/11 weeks</p></div>
+<div class="phasebar plan"><div class="phasebar-head"><span class="phasebar-name">Marathon training · 18 weeks</span><span class="phasebar-km">0 km / 1179.2 km</span></div><div class="phasebar-track" role="img" aria-label="Marathon training · 18 weeks, 0 km / 1179.2 km"></div><p class="phasebar-weeks" title="Finished weeks at 85% of the planned distance">0/18 weeks</p></div>
+</section>
+</body>
+</html>

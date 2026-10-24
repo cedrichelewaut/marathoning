@@ -8,9 +8,10 @@ Commands:
     status [--week N]           Compare actual vs planned for a week
     sync-status                 Write aggregated weekly status for all weeks
                                  (data/weekly_status.csv) from data/strava_runs.csv
-    sync-site                   Rebuild weekly status and docs/index.html
-                                 from data/strava_runs.csv. Idempotent.
-    render-site                 Build docs/index.html from weekly status and the run log
+    sync-site                   Rebuild weekly status, docs/index.html, and
+                                 docs/progress.html from data/strava_runs.csv. Idempotent.
+    render-site                 Build docs/index.html and docs/progress.html
+                                 from weekly status and the run log
     predict --time T --distance D [--goal]
                                  Predict finish times / show training paces
 """
@@ -30,6 +31,7 @@ RUNS_PATH = "data/runs.csv"
 STRAVA_RUNS_PATH = "data/strava_runs.csv"
 WEEKLY_STATUS_PATH = "data/weekly_status.csv"
 SITE_OUT_PATH = "docs/index.html"
+PROGRESS_OUT_PATH = "docs/progress.html"
 
 
 def load_config() -> dict:
@@ -139,8 +141,8 @@ def cmd_sync_site(args: argparse.Namespace) -> None:
     weeks, runs, skipped = _rebuild_weekly_status()
     cmd_render_site(args)
     extra = f" ({skipped} duplicate ids skipped)" if skipped else ""
-    print(f"Regenerated {WEEKLY_STATUS_PATH} ({weeks} weeks) and {SITE_OUT_PATH} "
-          f"from {runs} runs in {STRAVA_RUNS_PATH}{extra}.")
+    print(f"Regenerated {WEEKLY_STATUS_PATH} ({weeks} weeks), {SITE_OUT_PATH}, "
+          f"and {PROGRESS_OUT_PATH} from {runs} runs in {STRAVA_RUNS_PATH}{extra}.")
 
 
 def cmd_render_site(args: argparse.Namespace) -> None:
@@ -158,8 +160,16 @@ def cmd_render_site(args: argparse.Namespace) -> None:
     )
     with open(SITE_OUT_PATH, "w") as f:
         f.write(html_out)
+    progress_out = site.render_progress(
+        schedule_path=SCHEDULE_PATH,
+        weekly_status_path=WEEKLY_STATUS_PATH,
+        race_date=_as_date(cfg["race"]["date"]),
+        runs_path=STRAVA_RUNS_PATH,
+    )
+    with open(PROGRESS_OUT_PATH, "w") as f:
+        f.write(progress_out)
     open("docs/.nojekyll", "w").close()
-    print(f"Wrote {SITE_OUT_PATH}")
+    print(f"Wrote {SITE_OUT_PATH} and {PROGRESS_OUT_PATH}")
 
 
 def cmd_predict(args: argparse.Namespace) -> None:

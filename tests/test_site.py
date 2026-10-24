@@ -188,6 +188,22 @@ class PageTests(unittest.TestCase):
         self.assertNotIn(">Day<", page)
         self.assertIn('class="phasebar base"', page)
         self.assertIn('class="phasebar plan"', page)
+        embed = site.render_progress(
+            str(ROOT / "data" / "schedule.csv"),
+            str(ROOT / "data" / "weekly_status.csv"),
+            datetime.date(2027, 4, 25),
+            today=datetime.date(2026, 10, 24),
+            runs_path=str(ROOT / "data" / "strava_runs.csv"),
+        )
+        self.assertIn("61.2 km / 311 km", embed)
+        self.assertIn("2/11 weeks", embed)
+        self.assertIn("0 km / 1179.2 km", embed)
+        self.assertIn("0/18 weeks", embed)
+        self.assertIn("background: transparent", embed)
+        self.assertNotIn("<h1", embed)
+        self.assertNotIn("Coming up", embed)
+        self.assertNotIn("Last updated", embed)
+        self.assertNotIn("Completed", embed)
         self.assertIn("km / ", page)
         self.assertIn("0/18 weeks", page)
         self.assertIn("fill green", page)

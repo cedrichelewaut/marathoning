@@ -861,24 +861,105 @@ def _countdown(race_date: datetime.date, today: datetime.date) -> str:
     return "Race day has passed"
 
 
+def _resolve_now(now: datetime.datetime | None) -> datetime.datetime:
+    if now is None:
+        return datetime.datetime.now(_BRUSSELS)
+    if now.tzinfo is None:
+        return now.replace(tzinfo=_BRUSSELS)
+    return now.astimezone(_BRUSSELS)
+
+
+def _weeks_for_page(schedule_path: str, weekly_status_path: str,
+                    race_date: datetime.date, today: datetime.date,
+                    runs_path: str | None) -> list[WeekView]:
+    run_rows = None
+    if runs_path:
+        from training import status as status_mod
+        run_rows, _skipped = status_mod.load_strava_runs(runs_path)
+    return build_weeks(schedule_path, weekly_status_path, race_date, today, run_rows=run_rows)
+
+
+_EMBED_STYLE = """
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; background: transparent;
+  color: #323338;
+  font-family: Figtree, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px; line-height: 1.3;
+}
+.phases {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0;
+}
+.phasebar {
+  min-width: 0; background: #f5f6f8; border-left: 6px solid #c4c4c4;
+  border-radius: 0 6px 6px 0; padding: 8px 10px 7px;
+}
+.phasebar.plan { border-left-color: #ff642e; background: #fff4ee; }
+.phasebar-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 2px 12px; flex-wrap: wrap; min-width: 0;
+}
+.phasebar-name {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.1px; color: #676879;
+  min-width: 0;
+}
+.phasebar.plan .phasebar-name { color: #323338; }
+.phasebar-km {
+  margin-left: auto; font-size: 13px; font-weight: 600; color: #323338;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.phasebar-track {
+  margin-top: 6px; height: 8px; background: #e6e9ef;
+  border-radius: 999px; overflow: hidden;
+}
+.phasebar.plan .phasebar-track { background: #ffd0c2; }
+.phasebar-fill { display: block; height: 100%; border-radius: 999px; background: #676879; }
+.phasebar.plan .phasebar-fill { background: #ff642e; }
+.phasebar-weeks { margin: 3px 0 0; color: #676879; font-size: 12px; line-height: 1.2; }
+@media (max-width: 640px) {
+  .phases { grid-template-columns: 1fr; gap: 6px; }
+}
+"""
+
+
+def render_progress(schedule_path: str, weekly_status_path: str,
+                    race_date: datetime.date,
+                    today: datetime.date | None = None,
+                    runs_path: str | None = None,
+                    now: datetime.datetime | None = None) -> str:
+    """Only the two phase bars, for an iframe on another site."""
+    moment = _resolve_now(now)
+    today = today or moment.date()
+    weeks = _weeks_for_page(schedule_path, weekly_status_path, race_date, today, runs_path)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Training progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>{_EMBED_STYLE}</style>
+</head>
+<body>
+{_phase_bars(weeks)}
+</body>
+</html>
+"""
+
+
 def render(schedule_path: str, weekly_status_path: str, race_name: str,
            race_date: datetime.date, goal_pace: str,
            today: datetime.date | None = None,
            runs_path: str | None = None,
            now: datetime.datetime | None = None) -> str:
-    if now is None:
-        brussels_now = datetime.datetime.now(_BRUSSELS)
-    elif now.tzinfo is None:
-        brussels_now = now.replace(tzinfo=_BRUSSELS)
-    else:
-        brussels_now = now.astimezone(_BRUSSELS)
+    brussels_now = _resolve_now(now)
     today = today or brussels_now.date()
     updated = last_updated_label(brussels_now)
-    run_rows = None
-    if runs_path:
-        from training import status as status_mod
-        run_rows, _skipped = status_mod.load_strava_runs(runs_path)
-    weeks = build_weeks(schedule_path, weekly_status_path, race_date, today, run_rows=run_rows)
+    weeks = _weeks_for_page(schedule_path, weekly_status_path, race_date, today, runs_path)
     grouped = group_weeks(weeks)
     groups_html = "\n".join(_group(bucket, grouped[bucket], today) for bucket in _GROUP_ORDER)
     title = f"{race_name} training"

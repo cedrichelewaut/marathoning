@@ -100,8 +100,9 @@ Regenerate the totals and the page:
 python cli.py sync-site
 ```
 
-That rewrites `data/weekly_status.csv` and `docs/index.html` from
-`data/schedule.csv` plus `data/strava_runs.csv`. Running it again with the
+That rewrites `data/weekly_status.csv`, `docs/index.html`, and the embed
+`docs/progress.html` from `data/schedule.csv` plus `data/strava_runs.csv`.
+Running it again with the
 same file produces the same output. You can also run it by hand from the
 Actions tab (workflow **Regenerate site from logged runs**).
 
@@ -146,7 +147,7 @@ Uses Jack Daniels' VDOT formula plus a Riegel-formula cross-check.
 
 ```
 python cli.py sync-site
-git add data/strava_runs.csv data/weekly_status.csv docs/index.html
+git add data/strava_runs.csv data/weekly_status.csv docs/index.html docs/progress.html
 git commit -m "Update logged runs and site"
 git push
 ```
