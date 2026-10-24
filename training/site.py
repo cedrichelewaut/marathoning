@@ -2,8 +2,8 @@
 
 Week totals come from data/weekly_status.csv (written by sync-site from
 data/strava_runs.csv). When the run log is passed in, those totals are
-recomputed from it and This week lists each planned session beside the
-run logged on the same date. The log has no tokens.
+recomputed from it. Sessions are matched to runs inside the week, not by
+calendar date, because the days can move. The log has no tokens.
 
 The page is a monday.com-style board with three groups:
 
@@ -87,49 +87,138 @@ def completed_summary(weeks: list[WeekView]) -> str:
     return f"{fmt_km(actual)}/{fmt_km(planned)} km completed, {done}/{total} {unit}"
 
 
-def _planned_km_before(week: WeekView, today: datetime.date) -> float:
-    """Planned kilometres on sessions dated before today."""
-    total = 0.0
-    for day in week.days:
-        if day.get("workout") == "Rest or cross-train" or not day.get("distance_km"):
-            continue
-        if datetime.date.fromisoformat(day["date"]) < today:
-            total += float(day["distance_km"])
-    return total
-
-
 def status_for(week: WeekView, today: datetime.date) -> tuple[str, str]:
     """Return (css class, label) for the week's status pill.
 
     Upcoming weeks are Not started. A week at the on-track bar is Done.
-    The current week is On track until the kilometres due on earlier days
-    this week fall behind that bar; then it is Behind. A finished week
-    under the bar is Behind.
+    The current week stays On track until it ends, because a session can
+    move to another day. A finished week under the bar is Behind.
     """
+    del today  # The bucket is already chosen from this date.
     if week.bucket == "upcoming":
         return "not-started", "Not started"
     if week.planned_km <= 0 or counts_as_done(week.planned_km, week.actual_km):
         return "done", "Done"
     if week.bucket == "this-week":
-        due = _planned_km_before(week, today)
-        if due > 0 and not counts_as_done(due, week.actual_km):
-            return "behind", "Behind"
         return "on-track", "On track"
     return "behind", "Behind"
 
 
-def session_status(planned_km: float, logged_km: float, day: datetime.date,
-                   today: datetime.date) -> tuple[str, str]:
-    """Status for one planned day compared with the runs logged that date.
+def delta_label(actual_km: float, planned_km: float) -> str:
+    """'+1 km', '-1 km', or 'on plan' when the gap is within half a kilometre."""
+    diff = actual_km - planned_km
+    if abs(diff) <= 0.5:
+        return "on plan"
+    if diff > 0:
+        rounded = int(diff + 0.5)
+    else:
+        rounded = int(diff - 0.5)
+    if rounded == 0:
+        return "on plan"
+    return f"{rounded:+d} km"
 
-    Today and future days stay Not started until a run is logged. A past
-    day with no run, or a run under the on-track bar, is Behind.
+
+@dataclass(frozen=True)
+class SessionMatch:
+    """One planned session or an extra run, after within-week matching."""
+
+    role: str  # matched, additional, missed, todo
+    label: str
+    planned: dict | None
+    run: dict | None
+
+
+def _is_long_workout(name: str) -> bool:
+    text = name.lower()
+    return "long run" in text or text.startswith("long")
+
+
+def _planned_long(sessions: list[dict]) -> dict:
+    """The planned long run, or the longest session when none is named."""
+    def key(session: dict) -> tuple:
+        named = 1 if _is_long_workout(session.get("workout") or "") else 0
+        day = session.get("date") or "9999-99-99"
+        return (named, float(session["distance_km"]), tuple(-ord(ch) for ch in day))
+
+    return max(sessions, key=key)
+
+
+def _longest_run(runs: list[dict]) -> dict:
+    return min(
+        runs,
+        key=lambda run: (
+            -float(run["distance_km"]),
+            run.get("date") or "",
+            run.get("strava_activity_id") or "",
+            run.get("name") or "",
+        ),
+    )
+
+
+def match_sessions(planned: list[dict], runs: list[dict], *, week_over: bool) -> list[SessionMatch]:
+    """Pair runs with sessions inside one week.
+
+    The longest run fills the planned long run. Each remaining run fills the
+    unmatched session closest in distance. Ties break toward the earlier
+    session, then the earlier run. Extra runs are Additional. A session with
+    no run is Missed once the week is over, and To do until then.
     """
-    if logged_km > 0 and (planned_km <= 0 or counts_as_done(planned_km, logged_km)):
-        return "done", "Done"
-    if day < today or logged_km > 0:
-        return "behind", "Behind"
-    return "not-started", "Not started"
+    sessions = [day for day in planned if not _is_rest(day) and day.get("distance_km")]
+    pool = list(runs)
+    paired: dict[int, dict] = {}
+
+    if sessions and pool:
+        long_session = _planned_long(sessions)
+        long_run = _longest_run(pool)
+        paired[id(long_session)] = long_run
+        sessions = [day for day in sessions if day is not long_session]
+        pool = [run for run in pool if run is not long_run]
+
+    while sessions and pool:
+        best_key: tuple | None = None
+        best: tuple[dict, dict] | None = None
+        for session in sessions:
+            planned_km = float(session["distance_km"])
+            for run in pool:
+                key = (
+                    abs(float(run["distance_km"]) - planned_km),
+                    session.get("date") or "",
+                    run.get("date") or "",
+                    run.get("strava_activity_id") or "",
+                    run.get("name") or "",
+                    session.get("workout") or "",
+                )
+                if best_key is None or key < best_key:
+                    best_key = key
+                    best = (session, run)
+        assert best is not None
+        session, run = best
+        paired[id(session)] = run
+        sessions = [day for day in sessions if day is not session]
+        pool = [item for item in pool if item is not run]
+
+    gap = ("missed", "Missed") if week_over else ("todo", "To do")
+    rows: list[SessionMatch] = []
+    for day in planned:
+        if _is_rest(day) or not day.get("distance_km"):
+            continue
+        run = paired.get(id(day))
+        if run is None:
+            rows.append(SessionMatch(gap[0], gap[1], day, None))
+            continue
+        rows.append(SessionMatch(
+            "matched",
+            delta_label(float(run["distance_km"]), float(day["distance_km"])),
+            day,
+            run,
+        ))
+    for run in sorted(pool, key=lambda item: (
+        item.get("date") or "",
+        item.get("strava_activity_id") or "",
+        item.get("name") or "",
+    )):
+        rows.append(SessionMatch("additional", "Additional", None, run))
+    return rows
 
 
 def bar_width(week: WeekView) -> float:
@@ -271,90 +360,75 @@ def _plan_text(days: list[dict]) -> str:
     return " · ".join(bits) if bits else "—"
 
 
-def _workout_label(days: list[dict]) -> str:
-    names = [day.get("workout") or "" for day in days if not _is_rest(day) and day.get("workout")]
-    if names:
-        return " · ".join(names)
-    if any(_is_rest(day) for day in days):
-        return "Rest or cross-train"
-    return "Extra run"
+def _day_label(iso: str) -> str:
+    day = datetime.date.fromisoformat(iso)
+    return f"{day.strftime('%a')} {day.day}"
 
 
-def _planned_km(days: list[dict]) -> float:
-    return sum(float(day["distance_km"]) for day in days if day.get("distance_km") and not _is_rest(day))
+def _run_text(run: dict, *, include_date: bool) -> str:
+    name = (run.get("name") or "").strip() or "Run"
+    pieces: list[str] = []
+    if include_date and run.get("date"):
+        pieces.append(_day_label(run["date"]))
+    pieces.append(name)
+    pieces.append(f"{fmt_km(float(run['distance_km']))} km")
+    moving = (run.get("moving_time") or "").strip()
+    if moving:
+        pieces.append(moving)
+    return " · ".join(pieces)
 
 
-def _logged_km(runs: list[dict]) -> float:
-    return sum(float(run["distance_km"]) for run in runs)
+def _tag_class(label: str) -> str:
+    if label == "on plan":
+        return "on-plan"
+    if label == "Additional":
+        return "additional"
+    if label == "Missed":
+        return "missed"
+    if label == "To do":
+        return "todo"
+    if label.startswith("+"):
+        return "plus"
+    if label.startswith("-"):
+        return "minus"
+    return "todo"
 
 
-def _logged_html(runs: list[dict]) -> str:
-    lines: list[str] = []
-    for run in runs:
-        name = (run.get("name") or "").strip() or "Run"
-        pieces = [name, f"{fmt_km(float(run['distance_km']))} km"]
-        moving = (run.get("moving_time") or "").strip()
-        if moving:
-            pieces.append(moving)
-        lines.append(f'<span class="runline">{_esc(" · ".join(pieces))}</span>')
-    return "".join(lines)
-
-
-def _session_rows(week: WeekView, today: datetime.date) -> str:
-    """One row per planned day, with the run logged on that date beside it."""
-    by_date: dict[str, list[dict]] = {}
-    order: list[str] = []
-    for day in week.days:
-        key = day["date"]
-        if key not in by_date:
-            by_date[key] = []
-            order.append(key)
-        by_date[key].append(day)
-    logged_by_date: dict[str, list[dict]] = {}
-    for run in week.logged:
-        logged_by_date.setdefault(run["date"], []).append(run)
-
-    rows: list[tuple[datetime.date, list[dict], list[dict]]] = []
-    for key in order:
-        day = datetime.date.fromisoformat(key)
-        planned_days = by_date[key]
-        runs = logged_by_date.get(key, [])
-        if all(_is_rest(item) for item in planned_days) and not runs:
-            continue
-        rows.append((day, planned_days, runs))
-    for key in sorted(logged_by_date):
-        if key in by_date:
-            continue
-        rows.append((datetime.date.fromisoformat(key), [], logged_by_date[key]))
-    rows.sort(key=lambda item: item[0])
-    if not rows:
+def _session_rows(week: WeekView) -> str:
+    """Planned sessions beside the run matched inside this week."""
+    matches = match_sessions(week.days, week.logged, week_over=week.bucket == "completed")
+    if not matches:
         return '<p class="why">No runs scheduled.</p>'
-
     parts = [
         '<div class="session head">'
-        "<span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span>"
+        "<span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Vs plan</span>"
         "</div>"
     ]
-    for day, planned_days, runs in rows:
-        logged_km = _logged_km(runs)
-        css, label = session_status(_planned_km(planned_days), logged_km, day, today)
-        when = f"{day.strftime('%a')} {day.day}"
-        if runs:
-            logged = _logged_html(runs)
+    for match in matches:
+        if match.role == "additional" and match.run is not None:
+            when = _day_label(match.run["date"]) if match.run.get("date") else ""
+            what = (match.run.get("name") or "").strip() or "Run"
+            plan = "—"
+            logged = _run_text(match.run, include_date=False)
             logged_class = "logged"
-        elif day < today:
-            logged = "No run logged"
-            logged_class = "logged miss"
         else:
-            logged = "Not yet"
-            logged_class = "logged wait"
+            planned = match.planned or {}
+            when = _day_label(planned["date"]) if planned.get("date") else ""
+            what = planned.get("workout") or ""
+            plan = _plan_text([planned]) if planned else "—"
+            if match.run is not None:
+                logged = _run_text(match.run, include_date=True)
+                logged_class = "logged"
+            else:
+                logged = "—"
+                logged_class = "logged wait"
         parts.append(
             '<div class="session">'
             f'<span class="when">{_esc(when)}</span>'
-            f'<span class="what">{_esc(_workout_label(planned_days))}</span>'
-            f'<span class="plan">{_esc(_plan_text(planned_days))}</span>'
-            f'<span class="{logged_class}">{logged if runs else _esc(logged)}</span>'
-            f'<span class="spill"><span class="pill sm {css}">{label}</span></span>'
+            f'<span class="what">{_esc(what)}</span>'
+            f'<span class="plan">{_esc(plan)}</span>'
+            f'<span class="{logged_class}">{_esc(logged)}</span>'
+            f'<span class="spill"><span class="tag {_tag_class(match.label)}">{_esc(match.label)}</span></span>'
             "</div>"
         )
     return "".join(parts)
@@ -379,7 +453,7 @@ def _row(week: WeekView, today: datetime.date) -> str:
   <span class="metric">{_esc(long_run)}</span>
   <span class="pill {css}">{label}</span>
 </summary>
-<div class="subitems">{_session_rows(week, today)}</div>
+<div class="subitems">{_session_rows(week)}</div>
 </details>"""
 
 
@@ -497,6 +571,16 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 .pill.behind { background: #e2445c; }
 .pill.not-started { background: #c4c4c4; }
 .pill.sm { height: 26px; margin: 0; width: 100%; font-size: 13px; }
+.tag {
+  display: flex; align-items: center; justify-content: center;
+  height: 26px; border-radius: 4px; color: #fff; font-size: 13px; font-weight: 500;
+  white-space: nowrap;
+}
+.tag.on-plan { background: #00c875; }
+.tag.plus { background: #579bfc; }
+.tag.minus, .tag.missed { background: #e2445c; }
+.tag.additional { background: #a25ddc; }
+.tag.todo { background: #c4c4c4; }
 .subitems {
   border-left: 6px solid var(--group); background: #fafbfc;
   padding: 4px 16px 8px 34px; margin: 0 0 4px;
@@ -616,7 +700,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
 {groups_html}
     </div></div>
     <footer>
-      <p>Every week shows logged kilometres against the plan. This week lists each planned session next to the run logged on that date. A past week counts as completed at 85% of its planned distance. Updated {today.isoformat()}.</p>
+      <p>Every week shows logged kilometres against the plan. Inside a week, the longest run fills the long session and the other runs fill the closest remaining distances. A matched run shows its gap from the plan. Extra runs are Additional. A session with no run is Missed once the week is over, and To do until then. A past week counts as completed at 85% of its planned distance. Updated {today.isoformat()}.</p>
     </footer>
   </div>
 </body>

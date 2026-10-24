@@ -6,12 +6,18 @@ Live schedule: https://cedrichelewaut.github.io/marathoning/
 
 The page compares the plan with `data/strava_runs.csv`. Every week shows
 planned km versus actual km, a progress bar, and a status pill: **Done**,
-**On track**, **Behind**, or **Not started**. **This week** is open and
-lists each planned session next to the run logged on that date (name,
-distance, moving time), so a missed day and a completed day are both
-visible. **Completed** stays collapsed; its header is the actual-vs-planned
-total, e.g. `52/54 km completed, 4/4 weeks`. **Coming up** is the rest of
-the plan. The book file stays local (see `.gitignore`).
+**On track**, **Behind**, or **Not started**. The current week stays On
+track until it ends, because a session can move to another day.
+
+**This week** is open, and the same comparison is in the expanded rows of
+**Completed**. Runs are matched within the week, not to a calendar date:
+the longest run fills the planned long run, and the other runs fill the
+closest remaining distances. A matched run shows a gap such as `+1 km`,
+`-1 km`, or `on plan` (within half a kilometre). Extra runs are
+**Additional**. A session with no run is **Missed** once the week is over,
+and **To do** until then. **Completed** stays collapsed; its header is the
+actual-vs-planned total, e.g. `52/54 km completed, 4/4 weeks`. **Coming
+up** is the rest of the plan. The book file stays local (see `.gitignore`).
 
 ## Setup
 
