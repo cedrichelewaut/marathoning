@@ -7,10 +7,10 @@ Commands:
                                  Import an export into data/runs.csv
     status [--week N]           Compare actual vs planned for a week
     sync-status                 Write aggregated weekly status for all weeks
-                                 (data/weekly_status.csv, safe to publish)
-    render-site                 Build docs/index.html for GitHub Pages
-    strava-auth                 One-time Strava API authorization
-    sync-strava [--days N]       Pull recent runs from Strava into data/runs.csv
+                                 (data/weekly_status.csv) from data/strava_runs.csv
+    sync-site                   Rebuild weekly status and docs/index.html
+                                 from data/strava_runs.csv. Idempotent.
+    render-site                 Build docs/index.html from weekly status and the run log
     predict --time T --distance D [--goal]
                                  Predict finish times / show training paces
 """
@@ -22,11 +22,12 @@ import datetime
 
 import yaml
 
-from training import importers, predict, schedule, site, status, strava
+from training import importers, predict, schedule, site, status
 
 CONFIG_PATH = "config.yaml"
 SCHEDULE_PATH = "data/schedule.csv"
 RUNS_PATH = "data/runs.csv"
+STRAVA_RUNS_PATH = "data/strava_runs.csv"
 WEEKLY_STATUS_PATH = "data/weekly_status.csv"
 SITE_OUT_PATH = "docs/index.html"
 
@@ -103,49 +104,18 @@ def cmd_import_runs(args: argparse.Namespace) -> None:
           f"to {RUNS_PATH}")
 
 
-def cmd_strava_auth(args: argparse.Namespace) -> None:
-    existing = strava.load_auth()
-    if existing and not args.force:
-        print("Already authorized (data/strava_auth.json exists). Pass --force to redo it.")
-        return
-    client_id = input("Strava Client ID (from strava.com/settings/api): ").strip()
-    client_secret = input("Strava Client Secret: ").strip()
-    print("\nOpen this URL, click Authorize, then copy the FULL URL you land on "
-          "(it will 404, that's expected, just copy the address bar):\n")
-    print(strava.authorize_url(client_id))
-    redirected = input("\nPaste the full redirected URL (or just the code= value): ").strip()
-    if "code=" in redirected:
-        code = redirected.split("code=")[1].split("&")[0]
-    else:
-        code = redirected
-    auth = strava.exchange_code(client_id, client_secret, code)
-    strava.save_auth(auth)
-    print(f"\nSaved to {strava.AUTH_PATH} (gitignored, never commit this file). "
-          "Run `python cli.py sync-strava` any time to pull recent runs.")
-
-
-def cmd_sync_strava(args: argparse.Namespace) -> None:
-    auth = strava.load_auth()
-    if not auth:
-        raise SystemExit("Not authorized yet. Run `python cli.py strava-auth` first.")
-    auth = strava.ensure_access_token(auth)
-
-    if auth.get("last_sync_epoch"):
-        after_epoch = auth["last_sync_epoch"]
-    else:
-        after_epoch = int((datetime.datetime.now() - datetime.timedelta(days=args.days)).timestamp())
-
-    activities = strava.fetch_runs(auth, after_epoch)
-    runs = strava.to_run_records(activities)
-    n = importers.write_runs_csv(RUNS_PATH, runs, append=True)
-    auth["last_sync_epoch"] = int(datetime.datetime.now().timestamp())
-    strava.save_auth(auth)
-    print(f"Pulled {len(runs)} runs from Strava, added {n} new (skipped duplicates) to {RUNS_PATH}")
+def _rebuild_weekly_status() -> tuple[int, int, int]:
+    """Returns (weeks, runs counted, duplicate ids skipped)."""
+    schedule_rows = status.load_schedule(SCHEDULE_PATH)
+    run_rows, skipped = status.load_strava_runs(STRAVA_RUNS_PATH)
+    weeks = status.all_weeks_status(schedule_rows, run_rows)
+    status.write_weekly_status_csv(WEEKLY_STATUS_PATH, weeks)
+    return len(weeks), len(run_rows), skipped
 
 
 def cmd_status(args: argparse.Namespace) -> None:
     schedule_rows = status.load_schedule(SCHEDULE_PATH)
-    run_rows = status.load_runs(RUNS_PATH)
+    run_rows, _skipped = status.load_strava_runs(STRAVA_RUNS_PATH)
     today = datetime.date.today()
     week_start = status.current_week_start(today)
     if args.week:
@@ -158,12 +128,19 @@ def cmd_status(args: argparse.Namespace) -> None:
 
 
 def cmd_sync_status(args: argparse.Namespace) -> None:
-    schedule_rows = status.load_schedule(SCHEDULE_PATH)
-    run_rows = status.load_runs(RUNS_PATH)
-    weeks = status.all_weeks_status(schedule_rows, run_rows)
-    status.write_weekly_status_csv(WEEKLY_STATUS_PATH, weeks)
-    print(f"Wrote aggregated status for {len(weeks)} weeks to {WEEKLY_STATUS_PATH} "
-          "(no raw run data, safe to commit/publish)")
+    weeks, runs, skipped = _rebuild_weekly_status()
+    print(f"Wrote aggregated status for {weeks} weeks to {WEEKLY_STATUS_PATH} "
+          f"from {runs} runs in {STRAVA_RUNS_PATH}"
+          + (f" ({skipped} duplicate ids skipped)" if skipped else ""))
+
+
+def cmd_sync_site(args: argparse.Namespace) -> None:
+    """Regenerate weekly totals and the page. Safe to run twice."""
+    weeks, runs, skipped = _rebuild_weekly_status()
+    cmd_render_site(args)
+    extra = f" ({skipped} duplicate ids skipped)" if skipped else ""
+    print(f"Regenerated {WEEKLY_STATUS_PATH} ({weeks} weeks) and {SITE_OUT_PATH} "
+          f"from {runs} runs in {STRAVA_RUNS_PATH}{extra}.")
 
 
 def cmd_render_site(args: argparse.Namespace) -> None:
@@ -177,6 +154,7 @@ def cmd_render_site(args: argparse.Namespace) -> None:
         race_name=cfg["race"]["name"],
         race_date=_as_date(cfg["race"]["date"]),
         goal_pace=cfg["goal"]["pace_per_km"],
+        runs_path=STRAVA_RUNS_PATH,
     )
     with open(SITE_OUT_PATH, "w") as f:
         f.write(html_out)
@@ -229,16 +207,8 @@ def main() -> None:
     p_status.set_defaults(func=cmd_status)
 
     sub.add_parser("sync-status").set_defaults(func=cmd_sync_status)
+    sub.add_parser("sync-site").set_defaults(func=cmd_sync_site)
     sub.add_parser("render-site").set_defaults(func=cmd_render_site)
-
-    p_strava_auth = sub.add_parser("strava-auth")
-    p_strava_auth.add_argument("--force", action="store_true", help="Redo authorization")
-    p_strava_auth.set_defaults(func=cmd_strava_auth)
-
-    p_sync_strava = sub.add_parser("sync-strava")
-    p_sync_strava.add_argument("--days", type=int, default=30,
-                                help="On first sync, how many days back to pull (default 30)")
-    p_sync_strava.set_defaults(func=cmd_sync_strava)
 
     p_predict = sub.add_parser("predict")
     p_predict.add_argument("--time", help="Result time, e.g. 19:30 or 1:45:00")
@@ -247,7 +217,10 @@ def main() -> None:
     p_predict.set_defaults(func=cmd_predict)
 
     args = parser.parse_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except (ValueError, FileNotFoundError) as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 if __name__ == "__main__":

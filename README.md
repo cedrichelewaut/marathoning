@@ -2,9 +2,16 @@
 
 Training setup for Hamburg Marathon, 25 April 2027.
 
-Live schedule: https://cedrichelewaut.github.io/marathoning/ (public — shows
-the plan and aggregated weekly progress, no raw run data or the book file,
-both of which stay local only, see `.gitignore`).
+Live schedule: https://cedrichelewaut.github.io/marathoning/
+
+The page compares the plan with `data/strava_runs.csv`. Every week shows
+planned km versus actual km, a progress bar, and a status pill: **Done**,
+**On track**, **Behind**, or **Not started**. **This week** is open and
+lists each planned session next to the run logged on that date (name,
+distance, moving time), so a missed day and a completed day are both
+visible. **Completed** stays collapsed; its header is the actual-vs-planned
+total, e.g. `52/54 km completed, 4/4 weeks`. **Coming up** is the rest of
+the plan. The book file stays local (see `.gitignore`).
 
 ## Setup
 
@@ -34,36 +41,69 @@ kept but marked optional.
 
 ## Logging actual runs
 
-### Strava (recommended — works for Coros/Garmin too if they auto-sync to Strava)
+Actual kilometres on the site come from one tracked file, `data/strava_runs.csv`.
+It holds run rows only: no client secret, no token, no refresh token.
+Strava has required a subscription for API apps since June 2026, so nothing
+here calls the Strava API. `training/strava.py` is an unused client kept in
+the tree; the generator does not import it, and CI does not need
+`data/strava_auth.json`, `data/runs.csv`, or `books/`.
 
-One-time setup:
+A morning updater appends new rows to `data/strava_runs.csv` on `main` through
+the GitHub API (it does not run Python). That push triggers
+`.github/workflows/regenerate-site.yml`, which runs `python cli.py sync-site`
+and, if the totals or the page changed, commits `data/weekly_status.csv` and
+`docs/` back to `main`. The same workflow then deploys GitHub Pages from the
+regenerated `docs/` directory. A `GITHUB_TOKEN` push does not start
+`pages.yml`, so the deploy step here is what publishes the page after the
+commit. The workflow uses `contents: write`, `pages: write`, and
+`id-token: write`. It does not stage `data/strava_runs.csv`, so the commit
+cannot start the workflow again. Deploying Pages does not create another
+commit.
 
-1. Go to https://www.strava.com/settings/api and create an API application.
-   "Authorization Callback Domain" can just be `localhost`.
-2. Note the Client ID and Client Secret it gives you.
-3. Run `python cli.py strava-auth`, paste in the Client ID/Secret when asked,
-   open the printed URL, click Authorize, then paste the URL you land on
-   (it 404s, that's fine — the `code=` in its address bar is what matters)
-   back into the prompt.
+### `data/strava_runs.csv`
 
-This saves a token to `data/strava_auth.json` (gitignored — it holds your
-API secret, never commit it). After that, any time you want to pull in
-recent runs:
+Columns, in this order:
+
+| Column | Format |
+| --- | --- |
+| `date` | `YYYY-MM-DD`, the local date of the run |
+| `name` | Activity title. Quote the field if it contains a comma. |
+| `distance_km` | Kilometres as a decimal, e.g. `8.02` |
+| `moving_time` | `h:mm:ss`, e.g. `0:46:12` |
+| `strava_activity_id` | Strava activity id. This is the dedupe key. |
+
+```csv
+date,name,distance_km,moving_time,strava_activity_id
+2026-10-22,Morning run,8.02,0:46:12,12345678901
+```
+
+Append one row per activity. Repeating a `strava_activity_id` is safe: the
+first row wins and the distance is counted once. A week counts toward the
+collapsed Completed header (`52/54 km completed, 4/4 weeks`) when its actual
+distance is at least 85% of the plan, the same on-track bar as
+`python cli.py status`.
+
+Regenerate the totals and the page:
 
 ```
-python cli.py sync-strava
+python cli.py sync-site
 ```
 
-Pulls everything since the last sync (or the last 30 days on first run,
-override with `--days`), skipping duplicates.
+That rewrites `data/weekly_status.csv` and `docs/index.html` from
+`data/schedule.csv` plus `data/strava_runs.csv`. Running it again with the
+same file produces the same output. You can also run it by hand from the
+Actions tab (workflow **Regenerate site from logged runs**).
 
-### Manual export (Strava bulk export or Garmin Connect CSV)
+`python cli.py status` reads the same file.
+
+### Manual export (optional, local only)
 
 ```
 python cli.py import-runs path/to/export.csv --source strava   # or garmin
 ```
 
-Appends new runs to `data/runs.csv`, skipping ones already imported.
+This appends to gitignored `data/runs.csv` and does not change the site.
+To publish a run, add a row to `data/strava_runs.csv` and run `sync-site`.
 
 ## Checking progress
 
@@ -93,18 +133,19 @@ Uses Jack Daniels' VDOT formula plus a Riegel-formula cross-check.
 
 ## Publishing the schedule to GitHub Pages
 
-After `sync-strava` or `import-runs` (or any time you want the public page
-to reflect current progress):
-
 ```
-python cli.py sync-status   # writes data/weekly_status.csv (aggregated, no raw runs)
-python cli.py render-site   # writes docs/index.html, for local preview
-git add data/schedule.csv data/weekly_status.csv
-git commit -m "Update schedule/status"
+python cli.py sync-site
+git add data/strava_runs.csv data/weekly_status.csv docs/index.html
+git commit -m "Update logged runs and site"
 git push
 ```
 
-Pushing to `main` triggers `.github/workflows/pages.yml`, which rebuilds
-`docs/index.html` from the committed CSVs and deploys it. `data/runs.csv`
-(your raw per-run log) and `books/` (the copyrighted training book) are
-gitignored and never leave your machine.
+Pushing to `main` triggers `.github/workflows/pages.yml`, which runs
+`sync-site` on a clean checkout (no book file, no private run export, no API
+token) and deploys `docs/`. A push that changes `data/strava_runs.csv` also
+triggers `.github/workflows/regenerate-site.yml`. That workflow regenerates
+the page, commits `data/weekly_status.csv` and `docs/` when they differ,
+then deploys GitHub Pages from those files. The commit cannot retrigger
+either workflow, because it is pushed with `GITHUB_TOKEN` and it does not
+touch `data/strava_runs.csv`. `data/runs.csv`, `data/strava_auth.json`, and
+`books/` stay gitignored.

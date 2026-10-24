@@ -6,9 +6,10 @@ __pycache__/
 # Copyrighted book, personal copy only, never publish.
 books/
 
-# Raw per-run log (from Strava/Garmin exports) stays local only.
-# schedule.csv and weekly_status.csv (aggregated) are tracked and published.
+# Optional local export. The site does not read this.
+# The tracked run log, the schedule, and weekly totals are published.
 data/runs.csv
 
-# Strava API client secret + tokens. Never commit this.
+# Only used if someone calls training/strava.py directly. Never commit it.
+# The generator does not read it.
 data/strava_auth.json
