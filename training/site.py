@@ -48,6 +48,7 @@ class WeekView:
     logged: list[dict] = field(default_factory=list)
     bucket: str = ""
     includes_race: bool = False
+    plan_week: int | None = None
 
     @property
     def pct(self) -> float:
@@ -62,6 +63,27 @@ def fmt_km(value: float) -> str:
     if text.endswith(".0"):
         return text[:-2]
     return text
+
+
+# The book block is 18 Mondays ending on race week.
+_PLAN_WEEKS = 18
+
+
+def plan_block_start(race_date: datetime.date) -> datetime.date:
+    """Monday of week 1, counting 18 weeks back from the race week."""
+    race_week = race_date - datetime.timedelta(days=race_date.weekday())
+    return race_week - datetime.timedelta(weeks=_PLAN_WEEKS - 1)
+
+
+def marathon_week_number(week_start: datetime.date, race_date: datetime.date) -> int | None:
+    """1–18 inside the race block, or None for earlier base-building weeks."""
+    start = plan_block_start(race_date)
+    if week_start < start:
+        return None
+    number = (week_start - start).days // 7 + 1
+    if number > _PLAN_WEEKS:
+        return None
+    return number
 
 
 def week_bucket(week_start: datetime.date, today: datetime.date) -> str:
@@ -319,6 +341,7 @@ def build_weeks(schedule_path: str, weekly_status_path: str, race_date: datetime
             logged=logged,
             bucket=week_bucket(week_start, today),
             includes_race=any(d["date"] == race_date.isoformat() for d in days),
+            plan_week=marathon_week_number(week_start, race_date),
         ))
     return views
 
@@ -469,9 +492,12 @@ def _row(week: WeekView, today: datetime.date) -> str:
     long_run = _metric(week.long_actual_km, week.long_planned_km)
     described = f"{fmt_km(week.actual_km)} of {fmt_km(week.planned_km)} kilometres, {tone}"
     opened = " open" if week.bucket == "this-week" else ""
+    number = ""
+    if week.plan_week:
+        number = f'<span class="wk">Week {week.plan_week}</span>'
     return f"""<details class="item"{opened}>
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">{_esc(_week_label(week))}</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>{number}<span class="weeklabel">{_esc(_week_label(week))}</span></span>
   <span class="phase" title="{_esc(week.phase)}">{_esc(_phase_label(week.phase))}</span>
   <span class="progress"><span class="bar {tone}" role="img" aria-label="{_esc(described)}">{fill_html}</span><span class="km">{_esc(distance)}</span></span>
   <span class="long">{_esc(long_run)}</span>
@@ -492,9 +518,37 @@ def _group_summary(bucket: str, weeks: list[WeekView]) -> str:
     return f"{len(weeks)} {unit}"
 
 
+def _band(kind: str) -> str:
+    """Section label inside a group. The race block is the one that should stand out."""
+    if kind == "plan":
+        label = "Marathon training · 18 weeks"
+        tone = "plan"
+    else:
+        label = "Base building"
+        tone = "base"
+    return (
+        f'<div class="band {tone}">'
+        f'<span class="band-name">{label}</span>'
+        '<span class="band-line" aria-hidden="true"></span>'
+        "</div>"
+    )
+
+
+def _section_rows(weeks: list[WeekView], today: datetime.date) -> str:
+    parts: list[str] = []
+    current = ""
+    for week in weeks:
+        kind = "plan" if week.plan_week else "base"
+        if kind != current:
+            parts.append(_band(kind))
+            current = kind
+        parts.append(_row(week, today))
+    return "\n".join(parts)
+
+
 def _group(bucket: str, weeks: list[WeekView], today: datetime.date) -> str:
     opened = "" if bucket == "completed" else " open"
-    rows = "\n".join(_row(w, today) for w in weeks) if weeks else '<p class="empty">Nothing scheduled.</p>'
+    rows = _section_rows(weeks, today) if weeks else '<p class="empty">Nothing scheduled.</p>'
     title = _GROUP_TITLE[bucket]
     summary = _group_summary(bucket, weeks)
     return f"""<details class="group {bucket}"{opened}>
@@ -573,6 +627,24 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
   padding-left: 10px; font-size: 14px; color: #323338; min-width: 0;
 }
 .weeklabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.wk {
+  flex: none; color: #ff642e; font-size: 12px; font-weight: 600;
+  letter-spacing: -0.1px; font-variant-numeric: tabular-nums;
+}
+.band {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 28px; margin: 14px 0 6px; padding: 4px 8px 4px 10px;
+  border-left: 6px solid #c4c4c4; min-width: 0;
+}
+.rows > .band:first-child { margin-top: 2px; }
+.band.plan { border-left-color: #ff642e; background: #fff4ee; border-radius: 0 4px 4px 0; }
+.band-name {
+  flex: 0 1 auto; min-width: 0; color: #676879; font-size: 13px; font-weight: 600;
+  letter-spacing: -0.1px;
+}
+.band.plan .band-name { color: #323338; }
+.band-line { flex: 1 1 24px; height: 1px; background: #e6e9ef; min-width: 16px; }
+.band.plan .band-line { background: #ffd0c2; }
 .phase, .long, .km { font-size: 14px; color: #323338; white-space: nowrap; min-width: 0; }
 .phase { overflow: hidden; text-overflow: ellipsis; }
 .long, .km { font-variant-numeric: tabular-nums; }

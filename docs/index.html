@@ -71,6 +71,24 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
   padding-left: 10px; font-size: 14px; color: #323338; min-width: 0;
 }
 .weeklabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.wk {
+  flex: none; color: #ff642e; font-size: 12px; font-weight: 600;
+  letter-spacing: -0.1px; font-variant-numeric: tabular-nums;
+}
+.band {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 28px; margin: 14px 0 6px; padding: 4px 8px 4px 10px;
+  border-left: 6px solid #c4c4c4; min-width: 0;
+}
+.rows > .band:first-child { margin-top: 2px; }
+.band.plan { border-left-color: #ff642e; background: #fff4ee; border-radius: 0 4px 4px 0; }
+.band-name {
+  flex: 0 1 auto; min-width: 0; color: #676879; font-size: 13px; font-weight: 600;
+  letter-spacing: -0.1px;
+}
+.band.plan .band-name { color: #323338; }
+.band-line { flex: 1 1 24px; height: 1px; background: #e6e9ef; min-width: 16px; }
+.band.plan .band-line { background: #ffd0c2; }
 .phase, .long, .km { font-size: 14px; color: #323338; white-space: nowrap; min-width: 0; }
 .phase { overflow: hidden; text-overflow: ellipsis; }
 .long, .km { font-variant-numeric: tabular-nums; }
@@ -161,7 +179,7 @@ footer p { margin: 0; }
       <div>
         <h1>Marathon training</h1>
         <p class="subtitle">Hamburg Marathon · April 25, 2027 · goal pace 4:30/km</p>
-        <p class="updated">Last updated 24 Oct 2026, 12:35</p>
+        <p class="updated">Last updated 24 Oct 2026, 12:44</p>
       </div>
       <p class="countdown">183 days to go</p>
     </header>
@@ -174,6 +192,7 @@ footer p { margin: 0; }
   <span></span><span class="phase">Phase</span><span>Progress</span><span class="long">Long run</span>
 </div>
 <div class="rows">
+<div class="band base"><span class="band-name">Base building</span><span class="band-line" aria-hidden="true"></span></div>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Oct 5 – 11</span></span>
@@ -202,6 +221,7 @@ footer p { margin: 0; }
   <span></span><span class="phase">Phase</span><span>Progress</span><span class="long">Long run</span>
 </div>
 <div class="rows">
+<div class="band base"><span class="band-name">Base building</span><span class="band-line" aria-hidden="true"></span></div>
 <details class="item" open>
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Oct 19 – 25</span></span>
@@ -221,6 +241,7 @@ footer p { margin: 0; }
   <span></span><span class="phase">Phase</span><span>Progress</span><span class="long">Long run</span>
 </div>
 <div class="rows">
+<div class="band base"><span class="band-name">Base building</span><span class="band-line" aria-hidden="true"></span></div>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Oct 26 – Nov 1</span></span>
@@ -293,9 +314,10 @@ footer p { margin: 0; }
 </summary>
 <div class="subitems"><div class="session head"><span>Session</span><span>Logged run</span><span>Vs plan</span></div><div class="session"><span class="what">Easy run · 11 km</span><span class="logged wait">—</span><span class="spill"><span class="tag todo">To do</span></span></div><div class="session"><span class="what">Easy run · 11 km</span><span class="logged wait">—</span><span class="spill"><span class="tag todo">To do</span></span></div><div class="session"><span class="what">Long run · 15 km</span><span class="logged wait">—</span><span class="spill"><span class="tag todo">To do</span></span></div></div>
 </details>
+<div class="band plan"><span class="band-name">Marathon training · 18 weeks</span><span class="band-line" aria-hidden="true"></span></div>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Dec 21 – 27</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 1</span><span class="weeklabel">Dec 21 – 27</span></span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 54 kilometres, neutral"></span><span class="km">0/54 km</span></span>
   <span class="long">0/18 km</span>
@@ -304,7 +326,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Dec 28, 2026 – Jan 3, 2027</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 2</span><span class="weeklabel">Dec 28, 2026 – Jan 3, 2027</span></span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 55 kilometres, neutral"></span><span class="km">0/55 km</span></span>
   <span class="long">0/19 km</span>
@@ -313,7 +335,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Jan 4 – 10</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 3</span><span class="weeklabel">Jan 4 – 10</span></span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 55 kilometres, neutral"></span><span class="km">0/55 km</span></span>
   <span class="long">0/19 km</span>
@@ -322,7 +344,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Jan 11 – 17</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 4</span><span class="weeklabel">Jan 11 – 17</span></span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 55 kilometres, neutral"></span><span class="km">0/55 km</span></span>
   <span class="long">0/19 km</span>
@@ -331,7 +353,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Jan 18 – 24</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 5</span><span class="weeklabel">Jan 18 – 24</span></span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 55 kilometres, neutral"></span><span class="km">0/55 km</span></span>
   <span class="long">0/19 km</span>
@@ -340,7 +362,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Jan 25 – 31</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 6</span><span class="weeklabel">Jan 25 – 31</span></span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 56 kilometres, neutral"></span><span class="km">0/56 km</span></span>
   <span class="long">0/20 km</span>
@@ -349,7 +371,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Feb 1 – 7</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 7</span><span class="weeklabel">Feb 1 – 7</span></span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 56 kilometres, neutral"></span><span class="km">0/56 km</span></span>
   <span class="long">0/20 km</span>
@@ -358,7 +380,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Feb 8 – 14</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 8</span><span class="weeklabel">Feb 8 – 14</span></span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 62 kilometres, neutral"></span><span class="km">0/62 km</span></span>
   <span class="long">0/22 km</span>
@@ -367,7 +389,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Feb 15 – 21</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 9</span><span class="weeklabel">Feb 15 – 21</span></span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 68 kilometres, neutral"></span><span class="km">0/68 km</span></span>
   <span class="long">0/25 km</span>
@@ -376,7 +398,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Feb 22 – 28</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 10</span><span class="weeklabel">Feb 22 – 28</span></span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 76 kilometres, neutral"></span><span class="km">0/76 km</span></span>
   <span class="long">0/24 km</span>
@@ -385,7 +407,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Mar 1 – 7</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 11</span><span class="weeklabel">Mar 1 – 7</span></span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 68 kilometres, neutral"></span><span class="km">0/68 km</span></span>
   <span class="long">0/25 km</span>
@@ -394,7 +416,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Mar 8 – 14</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 12</span><span class="weeklabel">Mar 8 – 14</span></span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 76 kilometres, neutral"></span><span class="km">0/76 km</span></span>
   <span class="long">0/24 km</span>
@@ -403,7 +425,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Mar 15 – 21</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 13</span><span class="weeklabel">Mar 15 – 21</span></span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 90 kilometres, neutral"></span><span class="km">0/90 km</span></span>
   <span class="long">0/32 km</span>
@@ -412,7 +434,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Mar 22 – 28</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 14</span><span class="weeklabel">Mar 22 – 28</span></span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 82 kilometres, neutral"></span><span class="km">0/82 km</span></span>
   <span class="long">0/30 km</span>
@@ -421,7 +443,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Mar 29 – Apr 4</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 15</span><span class="weeklabel">Mar 29 – Apr 4</span></span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 83 kilometres, neutral"></span><span class="km">0/83 km</span></span>
   <span class="long">0/28 km</span>
@@ -430,7 +452,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Apr 5 – 11</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 16</span><span class="weeklabel">Apr 5 – 11</span></span>
   <span class="phase" title="Taper">Taper</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 70 kilometres, neutral"></span><span class="km">0/70 km</span></span>
   <span class="long">0/27 km</span>
@@ -439,7 +461,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Apr 12 – 18</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 17</span><span class="weeklabel">Apr 12 – 18</span></span>
   <span class="phase" title="Taper">Taper</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 51 kilometres, neutral"></span><span class="km">0/51 km</span></span>
   <span class="long">0/15 km</span>
@@ -448,7 +470,7 @@ footer p { margin: 0; }
 </details>
 <details class="item">
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">Apr 19 – 25 · Race</span></span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wk">Week 18</span><span class="weeklabel">Apr 19 – 25 · Race</span></span>
   <span class="phase" title="Taper">Taper</span>
   <span class="progress"><span class="bar neutral" role="img" aria-label="0 of 67.2 kilometres, neutral"></span><span class="km">0/67.2 km</span></span>
   <span class="long">0/42.2 km</span>

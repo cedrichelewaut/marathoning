@@ -17,6 +17,14 @@ def _write(path: Path, text: str) -> None:
 
 
 class SummaryTests(unittest.TestCase):
+    def test_eighteen_week_block_counts_back_from_race_week(self) -> None:
+        race = datetime.date(2027, 4, 25)  # Sunday
+        self.assertEqual(site.plan_block_start(race), datetime.date(2026, 12, 21))
+        self.assertIsNone(site.marathon_week_number(datetime.date(2026, 12, 14), race))
+        self.assertEqual(site.marathon_week_number(datetime.date(2026, 12, 21), race), 1)
+        self.assertEqual(site.marathon_week_number(datetime.date(2027, 4, 19), race), 18)
+        self.assertIsNone(site.marathon_week_number(datetime.date(2027, 4, 26), race))
+
     def test_last_updated_uses_brussels_time(self) -> None:
         moment = datetime.datetime(2026, 10, 24, 10, 1, tzinfo=datetime.timezone.utc)
         self.assertEqual(site.last_updated_label(moment), "Last updated 24 Oct 2026, 12:01")
@@ -146,6 +154,17 @@ class PageTests(unittest.TestCase):
         self.assertIn("Long run · 8 km", page)
         self.assertIn("Oct 19 – 25", page)
         self.assertIn("Last updated", page)
+        self.assertIn("Base building", page)
+        self.assertIn("Marathon training · 18 weeks", page)
+        upcoming = page.split('class="group upcoming"', 1)[1]
+        self.assertLess(upcoming.find("Base building"), upcoming.find("Marathon training · 18 weeks"))
+        week_one = upcoming.find("Dec 21 – 27")
+        self.assertIn(">Week 1<", upcoming[week_one - 40:week_one])
+        week_eighteen = upcoming.find("Apr 19 – 25")
+        self.assertIn(">Week 18<", upcoming[week_eighteen - 40:week_eighteen])
+        completed = page.split('class="group this-week"', 1)[0]
+        self.assertIn("Base building", completed)
+        self.assertNotIn("Marathon training · 18 weeks", completed)
         self.assertNotIn("flexible day", page)
         self.assertNotIn(">Day<", page)
         self.assertIn("fill green", page)
