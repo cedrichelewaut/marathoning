@@ -84,15 +84,60 @@ class PageTests(unittest.TestCase):
         self.assertIn("28/40 km completed, 1/2 weeks", page)
         self.assertIn("5/20 km this week", page)
         self.assertIn(">Done<", page)
-        self.assertIn(">Stuck<", page)
-        self.assertIn(">Working on it<", page)
-        self.assertIn(">Planned<", page)
+        self.assertIn(">Behind<", page)
+        self.assertIn(">Not started<", page)
+        self.assertNotIn(">Stuck<", page)
+        self.assertNotIn(">Working on it<", page)
+        self.assertNotIn(">Planned<", page)
         self.assertIn("Oct 26 – Nov 1 · Race", page)
-        # Future weeks are Planned even though the status file marks them behind.
+        self.assertIn("0/30 km", page)
+        self.assertIn("Logged run", page)
+        self.assertEqual(page.count('<details class="item" open>'), 1)
+        # Future weeks stay Not started even though the status file marks them behind.
         upcoming = page.split('class="group upcoming"', 1)[1]
-        self.assertNotIn(">Stuck<", upcoming)
+        self.assertNotIn(">Behind<", upcoming)
+        self.assertIn(">Not started<", upcoming)
         self.assertIn("width:90%", page)
         self.assertIn("width:50%", page)
+
+    def test_status_pills_follow_the_plan(self) -> None:
+        today = datetime.date(2026, 10, 19)  # Monday
+        upcoming = site.WeekView(
+            datetime.date(2026, 10, 26), "Base-building", 20, 0, 8, 0, bucket="upcoming",
+        )
+        done = site.WeekView(
+            datetime.date(2026, 9, 28), "Base-building", 20, 18, 10, 10, bucket="completed",
+        )
+        behind = site.WeekView(
+            datetime.date(2026, 10, 5), "Base-building", 20, 10, 10, 4, bucket="completed",
+        )
+        on_track = site.WeekView(
+            datetime.date(2026, 10, 19), "Base-building", 20, 0, 8, 0,
+            days=[{"date": "2026-10-21", "workout": "Long run", "distance_km": "8"}],
+            bucket="this-week",
+        )
+        self.assertEqual(site.status_for(upcoming, today), ("not-started", "Not started"))
+        self.assertEqual(site.status_for(done, today), ("done", "Done"))
+        self.assertEqual(site.status_for(behind, today), ("behind", "Behind"))
+        self.assertEqual(site.status_for(on_track, today), ("on-track", "On track"))
+        missed = site.WeekView(
+            datetime.date(2026, 10, 19), "Base-building", 20, 0, 8, 0,
+            days=[{"date": "2026-10-19", "workout": "Easy run", "distance_km": "6"}],
+            bucket="this-week",
+        )
+        self.assertEqual(site.status_for(missed, datetime.date(2026, 10, 20)), ("behind", "Behind"))
+        self.assertEqual(
+            site.session_status(6, 0, datetime.date(2026, 10, 19), datetime.date(2026, 10, 20)),
+            ("behind", "Behind"),
+        )
+        self.assertEqual(
+            site.session_status(6, 6, datetime.date(2026, 10, 19), datetime.date(2026, 10, 20)),
+            ("done", "Done"),
+        )
+        self.assertEqual(
+            site.session_status(6, 0, datetime.date(2026, 10, 24), datetime.date(2026, 10, 24)),
+            ("not-started", "Not started"),
+        )
 
     def test_real_schedule_renders_three_groups(self) -> None:
         page = site.render(
@@ -136,11 +181,68 @@ class StravaRunsFeedTheBoardTests(unittest.TestCase):
                 str(root / "schedule.csv"), str(root / "weekly.csv"),
                 "Hamburg Marathon", datetime.date(2027, 4, 25), "4:30",
                 today=datetime.date(2026, 10, 24),
+                runs_path=str(root / "runs.csv"),
             )
         # 15.5 km in the week of Oct 5 (planned 17) clears 85%. Oct 19 is this week.
         self.assertIn("15.5/17 km completed, 1/1 week", page)
         self.assertIn(">Done<", page)
         self.assertIn("0/20 km this week", page)
+        self.assertIn("Morning", page)
+        self.assertIn("Treadmill", page)
+        self.assertNotIn("Morning again", page)
+        self.assertNotIn("9:00:00", page)
+
+    def test_this_week_matches_sessions_to_runs_by_date(self) -> None:
+        raw = """date,name,distance_km,moving_time,strava_activity_id
+2026-10-19,Morning run,6.10,0:34:12,1
+2026-10-19,Morning run duplicate,99.00,9:00:00,1
+2026-10-21,Short one,3.00,0:18:00,2
+2026-10-22,Extra jog,2.50,0:15:00,3
+"""
+        schedule = """date,phase,weeks_out,workout,distance_km,pace_per_km,duration,notes,explanation
+2026-10-19,Base-building,,Easy run,6,5:40,34m,,Easy.
+2026-10-20,Base-building,,Easy run,6,5:40,34m,,Easy.
+2026-10-21,Base-building,,Long run,8,5:38,45m,,Long.
+2026-10-24,Base-building,,Easy run,4,5:40,24m,,Today.
+2026-10-25,Base-building,,Easy run,4,5:40,24m,,Tomorrow.
+"""
+        weekly = """week_start,planned_km,actual_km,pct,verdict,long_run_planned_km,long_run_actual_km
+2026-10-19,28.0,0.0,0,behind,8.0,0.0
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _write(root / "runs.csv", raw)
+            _write(root / "schedule.csv", schedule)
+            _write(root / "weekly.csv", weekly)
+            rows, skipped = status.load_strava_runs(str(root / "runs.csv"))
+            self.assertEqual(skipped, 1)
+            self.assertEqual(rows[0]["name"], "Morning run")
+            self.assertEqual(rows[0]["moving_time"], "0:34:12")
+            page = site.render(
+                str(root / "schedule.csv"), str(root / "weekly.csv"),
+                "Hamburg Marathon", datetime.date(2027, 4, 25), "4:30",
+                today=datetime.date(2026, 10, 24),
+                runs_path=str(root / "runs.csv"),
+            )
+        self.assertIn("11.6/28 km this week", page)
+        self.assertIn(">Behind<", page)
+        self.assertIn("Morning run · 6.1 km · 0:34:12", page)
+        self.assertIn("Short one · 3 km · 0:18:00", page)
+        self.assertIn("Extra jog · 2.5 km · 0:15:00", page)
+        self.assertIn("No run logged", page)
+        self.assertIn("Not yet", page)
+        self.assertNotIn("Morning run duplicate", page)
+        self.assertNotIn("9:00:00", page)
+        self.assertIn('<details class="item" open>', page)
+        # Monday's 6.1 km meets the 6 km session. Tuesday was missed.
+        monday = page.split("Mon 19", 1)[1].split("Tue 20", 1)[0]
+        tuesday = page.split("Tue 20", 1)[1].split("Wed 21", 1)[0]
+        saturday = page.split("Sat 24", 1)[1].split("Sun 25", 1)[0]
+        self.assertIn(">Done<", monday)
+        self.assertIn(">Behind<", tuesday)
+        self.assertIn("No run logged", tuesday)
+        self.assertIn(">Not started<", saturday)
+        self.assertIn("Not yet", saturday)
 
     def test_bad_time_and_missing_id_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -154,6 +256,8 @@ class StravaRunsFeedTheBoardTests(unittest.TestCase):
             rows, skipped = status.load_strava_runs(str(path))
             self.assertEqual(skipped, 0)
             self.assertEqual(rows[0]["distance_km"], "5.0000")
+            self.assertEqual(rows[0]["name"], "Run")
+            self.assertEqual(rows[0]["moving_time"], "0:45:00")
 
 
 if __name__ == "__main__":

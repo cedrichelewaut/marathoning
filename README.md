@@ -2,13 +2,16 @@
 
 Training setup for Hamburg Marathon, 25 April 2027.
 
-Live schedule: https://cedrichelewaut.github.io/marathoning/ (public — shows
-the plan and aggregated weekly progress, no raw run data or the book file,
-both of which stay local only, see `.gitignore`).
+Live schedule: https://cedrichelewaut.github.io/marathoning/
 
-The page is a board with three groups: **Completed** (collapsed; the header
-is the actual-vs-planned total, e.g. `52/54 km completed, 4/4 weeks`),
-**This week**, and **Coming up**. Open a week for that week's runs.
+The page compares the plan with `data/strava_runs.csv`. Every week shows
+planned km versus actual km, a progress bar, and a status pill: **Done**,
+**On track**, **Behind**, or **Not started**. **This week** is open and
+lists each planned session next to the run logged on that date (name,
+distance, moving time), so a missed day and a completed day are both
+visible. **Completed** stays collapsed; its header is the actual-vs-planned
+total, e.g. `52/54 km completed, 4/4 weeks`. **Coming up** is the rest of
+the plan. The book file stays local (see `.gitignore`).
 
 ## Setup
 
@@ -49,9 +52,13 @@ A morning updater appends new rows to `data/strava_runs.csv` on `main` through
 the GitHub API (it does not run Python). That push triggers
 `.github/workflows/regenerate-site.yml`, which runs `python cli.py sync-site`
 and, if the totals or the page changed, commits `data/weekly_status.csv` and
-`docs/` back to `main`. The workflow uses `GITHUB_TOKEN` with contents write.
-It does not stage `data/strava_runs.csv`, so the commit cannot start the
-workflow again.
+`docs/` back to `main`. The same workflow then deploys GitHub Pages from the
+regenerated `docs/` directory. A `GITHUB_TOKEN` push does not start
+`pages.yml`, so the deploy step here is what publishes the page after the
+commit. The workflow uses `contents: write`, `pages: write`, and
+`id-token: write`. It does not stage `data/strava_runs.csv`, so the commit
+cannot start the workflow again. Deploying Pages does not create another
+commit.
 
 ### `data/strava_runs.csv`
 
@@ -136,6 +143,9 @@ git push
 Pushing to `main` triggers `.github/workflows/pages.yml`, which runs
 `sync-site` on a clean checkout (no book file, no private run export, no API
 token) and deploys `docs/`. A push that changes `data/strava_runs.csv` also
-triggers `.github/workflows/regenerate-site.yml`, which commits the
-regenerated `data/weekly_status.csv` and `docs/` if they differ.
-`data/runs.csv`, `data/strava_auth.json`, and `books/` stay gitignored.
+triggers `.github/workflows/regenerate-site.yml`. That workflow regenerates
+the page, commits `data/weekly_status.csv` and `docs/` when they differ,
+then deploys GitHub Pages from those files. The commit cannot retrigger
+either workflow, because it is pushed with `GITHUB_TOKEN` and it does not
+touch `data/strava_runs.csv`. `data/runs.csv`, `data/strava_auth.json`, and
+`books/` stay gitignored.

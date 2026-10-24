@@ -1,15 +1,16 @@
-"""Render a static HTML page from the schedule + aggregated weekly status.
+"""Render a static HTML page from the plan and the tracked run log.
 
-No raw per-run data is used here, only data/schedule.csv (the plan) and
-data/weekly_status.csv (aggregated planned/actual totals per week), so
-nothing from the private run log ends up in the published site.
+Week totals come from data/weekly_status.csv (written by sync-site from
+data/strava_runs.csv). When the run log is passed in, those totals are
+recomputed from it and This week lists each planned session beside the
+run logged on the same date. The log has no tokens.
 
 The page is a monday.com-style board with three groups:
 
 - Completed: weeks that are fully in the past. Collapsed by default.
   The header shows actual vs planned kilometres and how many of those
   weeks reached the on-track bar (see training.status.WeekStatus).
-- This week: the week that contains today.
+- This week: the week that contains today. Open, with one row per session.
 - Coming up: weeks that have not started.
 """
 
@@ -41,6 +42,7 @@ class WeekView:
     long_planned_km: float
     long_actual_km: float
     days: list[dict] = field(default_factory=list)
+    logged: list[dict] = field(default_factory=list)
     bucket: str = ""
     includes_race: bool = False
 
@@ -85,21 +87,53 @@ def completed_summary(weeks: list[WeekView]) -> str:
     return f"{fmt_km(actual)}/{fmt_km(planned)} km completed, {done}/{total} {unit}"
 
 
-def status_for(week: WeekView) -> tuple[str, str]:
-    """Return (css class, label) for the status pill."""
+def _planned_km_before(week: WeekView, today: datetime.date) -> float:
+    """Planned kilometres on sessions dated before today."""
+    total = 0.0
+    for day in week.days:
+        if day.get("workout") == "Rest or cross-train" or not day.get("distance_km"):
+            continue
+        if datetime.date.fromisoformat(day["date"]) < today:
+            total += float(day["distance_km"])
+    return total
+
+
+def status_for(week: WeekView, today: datetime.date) -> tuple[str, str]:
+    """Return (css class, label) for the week's status pill.
+
+    Upcoming weeks are Not started. A week at the on-track bar is Done.
+    The current week is On track until the kilometres due on earlier days
+    this week fall behind that bar; then it is Behind. A finished week
+    under the bar is Behind.
+    """
     if week.bucket == "upcoming":
-        return "planned", "Planned"
-    if week.bucket == "this-week":
-        if counts_as_done(week.planned_km, week.actual_km) and week.planned_km > 0:
-            return "done", "Done"
-        return "working", "Working on it"
-    if counts_as_done(week.planned_km, week.actual_km):
+        return "not-started", "Not started"
+    if week.planned_km <= 0 or counts_as_done(week.planned_km, week.actual_km):
         return "done", "Done"
-    return "stuck", "Stuck"
+    if week.bucket == "this-week":
+        due = _planned_km_before(week, today)
+        if due > 0 and not counts_as_done(due, week.actual_km):
+            return "behind", "Behind"
+        return "on-track", "On track"
+    return "behind", "Behind"
+
+
+def session_status(planned_km: float, logged_km: float, day: datetime.date,
+                   today: datetime.date) -> tuple[str, str]:
+    """Status for one planned day compared with the runs logged that date.
+
+    Today and future days stay Not started until a run is logged. A past
+    day with no run, or a run under the on-track bar, is Behind.
+    """
+    if logged_km > 0 and (planned_km <= 0 or counts_as_done(planned_km, logged_km)):
+        return "done", "Done"
+    if day < today or logged_km > 0:
+        return "behind", "Behind"
+    return "not-started", "Not started"
 
 
 def bar_width(week: WeekView) -> float:
-    if week.bucket == "upcoming" or week.pct <= 0:
+    if week.pct <= 0:
         return 0.0
     return max(4.0, min(100.0, week.pct))
 
@@ -114,8 +148,18 @@ def _load_schedule_by_week(schedule_path: str) -> dict[datetime.date, list[dict]
     return weeks
 
 
+def _runs_in_week(run_rows: list[dict], week_start: datetime.date) -> list[dict]:
+    week_end = week_start + datetime.timedelta(days=6)
+    logged = []
+    for run in run_rows:
+        day = datetime.date.fromisoformat(run["date"])
+        if week_start <= day <= week_end:
+            logged.append(run)
+    return logged
+
+
 def build_weeks(schedule_path: str, weekly_status_path: str, race_date: datetime.date,
-                today: datetime.date) -> list[WeekView]:
+                today: datetime.date, run_rows: list[dict] | None = None) -> list[WeekView]:
     from training import status as status_mod
 
     weeks_by_start = _load_schedule_by_week(schedule_path)
@@ -136,6 +180,11 @@ def build_weeks(schedule_path: str, weekly_status_path: str, race_date: datetime
             actual = 0.0
             long_planned = max(distances, default=0.0)
             long_actual = 0.0
+        logged: list[dict] = []
+        if run_rows is not None:
+            logged = _runs_in_week(run_rows, week_start)
+            actual = sum(float(run["distance_km"]) for run in logged)
+            long_actual = max((float(run["distance_km"]) for run in logged), default=0.0)
         views.append(WeekView(
             week_start=week_start,
             phase=phase,
@@ -144,6 +193,7 @@ def build_weeks(schedule_path: str, weekly_status_path: str, race_date: datetime
             long_planned_km=long_planned,
             long_actual_km=long_actual,
             days=days,
+            logged=logged,
             bucket=week_bucket(week_start, today),
             includes_race=any(d["date"] == race_date.isoformat() for d in days),
         ))
@@ -194,60 +244,133 @@ def _fmt_width(width: float) -> str:
     return f"{width:.1f}"
 
 
-def _metric(actual: float, planned: float, show_actual: bool) -> str:
+def _metric(actual: float, planned: float) -> str:
     if planned <= 0 and actual <= 0:
         return "—"
-    if show_actual:
-        return f"{fmt_km(actual)}/{fmt_km(planned)} km"
-    return f"{fmt_km(planned)} km"
+    return f"{fmt_km(actual)}/{fmt_km(planned)} km"
 
 
-def _runs(days: list[dict]) -> list[dict]:
-    return [d for d in days if d.get("workout") != "Rest or cross-train"]
+def _is_rest(day: dict) -> bool:
+    return day.get("workout") == "Rest or cross-train"
 
 
-def _subitems(week: WeekView) -> str:
-    runs = _runs(week.days)
-    if not runs:
-        return '<p class="why">No runs scheduled.</p>'
-    parts: list[str] = []
-    for day in runs:
-        date = datetime.date.fromisoformat(day["date"])
-        when = f"{date.strftime('%a')} {date.day}"
-        bits = []
+def _plan_text(days: list[dict]) -> str:
+    bits: list[str] = []
+    for day in days:
+        if _is_rest(day):
+            continue
+        parts: list[str] = []
         if day.get("distance_km"):
-            bits.append(f"{fmt_km(float(day['distance_km']))} km")
+            parts.append(f"{fmt_km(float(day['distance_km']))} km")
         if day.get("pace_per_km"):
-            bits.append(f"{_esc(day['pace_per_km'])}/km")
+            parts.append(f"{day['pace_per_km']}/km")
         if day.get("duration"):
-            bits.append(_esc(day["duration"]))
-        how = " · ".join(bits)
+            parts.append(day["duration"])
+        if parts:
+            bits.append(" · ".join(parts))
+    return " · ".join(bits) if bits else "—"
+
+
+def _workout_label(days: list[dict]) -> str:
+    names = [day.get("workout") or "" for day in days if not _is_rest(day) and day.get("workout")]
+    if names:
+        return " · ".join(names)
+    if any(_is_rest(day) for day in days):
+        return "Rest or cross-train"
+    return "Extra run"
+
+
+def _planned_km(days: list[dict]) -> float:
+    return sum(float(day["distance_km"]) for day in days if day.get("distance_km") and not _is_rest(day))
+
+
+def _logged_km(runs: list[dict]) -> float:
+    return sum(float(run["distance_km"]) for run in runs)
+
+
+def _logged_html(runs: list[dict]) -> str:
+    lines: list[str] = []
+    for run in runs:
+        name = (run.get("name") or "").strip() or "Run"
+        pieces = [name, f"{fmt_km(float(run['distance_km']))} km"]
+        moving = (run.get("moving_time") or "").strip()
+        if moving:
+            pieces.append(moving)
+        lines.append(f'<span class="runline">{_esc(" · ".join(pieces))}</span>')
+    return "".join(lines)
+
+
+def _session_rows(week: WeekView, today: datetime.date) -> str:
+    """One row per planned day, with the run logged on that date beside it."""
+    by_date: dict[str, list[dict]] = {}
+    order: list[str] = []
+    for day in week.days:
+        key = day["date"]
+        if key not in by_date:
+            by_date[key] = []
+            order.append(key)
+        by_date[key].append(day)
+    logged_by_date: dict[str, list[dict]] = {}
+    for run in week.logged:
+        logged_by_date.setdefault(run["date"], []).append(run)
+
+    rows: list[tuple[datetime.date, list[dict], list[dict]]] = []
+    for key in order:
+        day = datetime.date.fromisoformat(key)
+        planned_days = by_date[key]
+        runs = logged_by_date.get(key, [])
+        if all(_is_rest(item) for item in planned_days) and not runs:
+            continue
+        rows.append((day, planned_days, runs))
+    for key in sorted(logged_by_date):
+        if key in by_date:
+            continue
+        rows.append((datetime.date.fromisoformat(key), [], logged_by_date[key]))
+    rows.sort(key=lambda item: item[0])
+    if not rows:
+        return '<p class="why">No runs scheduled.</p>'
+
+    parts = [
+        '<div class="session head">'
+        "<span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span>"
+        "</div>"
+    ]
+    for day, planned_days, runs in rows:
+        logged_km = _logged_km(runs)
+        css, label = session_status(_planned_km(planned_days), logged_km, day, today)
+        when = f"{day.strftime('%a')} {day.day}"
+        if runs:
+            logged = _logged_html(runs)
+            logged_class = "logged"
+        elif day < today:
+            logged = "No run logged"
+            logged_class = "logged miss"
+        else:
+            logged = "Not yet"
+            logged_class = "logged wait"
         parts.append(
-            '<div class="sub">'
+            '<div class="session">'
             f'<span class="when">{_esc(when)}</span>'
-            f'<span class="what">{_esc(day.get("workout"))}</span>'
-            f'<span class="how">{how}</span>'
+            f'<span class="what">{_esc(_workout_label(planned_days))}</span>'
+            f'<span class="plan">{_esc(_plan_text(planned_days))}</span>'
+            f'<span class="{logged_class}">{logged if runs else _esc(logged)}</span>'
+            f'<span class="spill"><span class="pill sm {css}">{label}</span></span>'
             "</div>"
         )
-        note = day.get("notes") or ""
-        why = day.get("explanation") or ""
-        extra = " · ".join(p for p in (note, why) if p)
-        if extra:
-            parts.append(f'<p class="why">{_esc(extra)}</p>')
     return "".join(parts)
 
 
-def _row(week: WeekView) -> str:
-    css, label = status_for(week)
-    show_actual = week.bucket != "upcoming"
+def _row(week: WeekView, today: datetime.date) -> str:
+    css, label = status_for(week, today)
     width = bar_width(week)
     fill_html = (
         f'<span class="fill {css}" style="width:{_fmt_width(width)}%"></span>' if width else ""
     )
-    distance = _metric(week.actual_km, week.planned_km, show_actual)
-    long_run = _metric(week.long_actual_km, week.long_planned_km, show_actual)
+    distance = _metric(week.actual_km, week.planned_km)
+    long_run = _metric(week.long_actual_km, week.long_planned_km)
     described = f"{fmt_km(week.actual_km)} of {fmt_km(week.planned_km)} kilometres"
-    return f"""<details class="item">
+    opened = " open" if week.bucket == "this-week" else ""
+    return f"""<details class="item"{opened}>
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>{_esc(_week_label(week))}</span>
   <span class="phase" title="{_esc(week.phase)}">{_esc(_phase_label(week.phase))}</span>
@@ -256,7 +379,7 @@ def _row(week: WeekView) -> str:
   <span class="metric">{_esc(long_run)}</span>
   <span class="pill {css}">{label}</span>
 </summary>
-<div class="subitems">{_subitems(week)}</div>
+<div class="subitems">{_session_rows(week, today)}</div>
 </details>"""
 
 
@@ -272,9 +395,9 @@ def _group_summary(bucket: str, weeks: list[WeekView]) -> str:
     return f"{len(weeks)} {unit}"
 
 
-def _group(bucket: str, weeks: list[WeekView]) -> str:
+def _group(bucket: str, weeks: list[WeekView], today: datetime.date) -> str:
     opened = "" if bucket == "completed" else " open"
-    rows = "\n".join(_row(w) for w in weeks) if weeks else '<p class="empty">Nothing scheduled.</p>'
+    rows = "\n".join(_row(w, today) for w in weeks) if weeks else '<p class="empty">Nothing scheduled.</p>'
     title = _GROUP_TITLE[bucket]
     summary = _group_summary(bucket, weeks)
     return f"""<details class="group {bucket}"{opened}>
@@ -361,29 +484,40 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 }
 .fill { display: block; height: 100%; border-radius: 999px; }
 .fill.done { background: #00c875; }
-.fill.working { background: #579bfc; }
-.fill.stuck { background: #e2445c; }
+.fill.on-track { background: #579bfc; }
+.fill.behind { background: #e2445c; }
+.fill.not-started { background: #c4c4c4; }
 .pill {
   display: flex; align-items: center; justify-content: center;
   height: 30px; margin: 5px 8px 5px 0; border-radius: 4px;
   color: #fff; font-size: 14px; font-weight: 500; white-space: nowrap;
 }
 .pill.done { background: #00c875; }
-.pill.working { background: #fdab3d; }
-.pill.stuck { background: #e2445c; }
-.pill.planned { background: #c4c4c4; }
+.pill.on-track { background: #579bfc; }
+.pill.behind { background: #e2445c; }
+.pill.not-started { background: #c4c4c4; }
+.pill.sm { height: 26px; margin: 0; width: 100%; font-size: 13px; }
 .subitems {
   border-left: 6px solid var(--group); background: #fafbfc;
-  padding: 6px 16px 10px 34px; margin: 0 0 4px;
+  padding: 4px 16px 8px 34px; margin: 0 0 4px;
 }
-.sub {
-  display: grid; grid-template-columns: 72px minmax(160px, 1fr) auto;
-  gap: 8px 16px; align-items: baseline; padding: 4px 0;
+.session {
+  display: grid;
+  grid-template-columns: 72px minmax(150px, 1.4fr) minmax(120px, 1fr) minmax(180px, 1.5fr) 116px;
+  gap: 6px 12px; align-items: center; padding: 5px 0;
+  border-top: 1px solid #eceff3;
 }
-.when { color: #676879; font-size: 13px; }
-.what { color: #323338; font-size: 13px; }
-.how { color: #676879; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.why { margin: 0 0 6px 88px; color: #676879; font-size: 12px; line-height: 1.45; }
+.session.head {
+  border-top: 0; color: #676879; font-size: 12px; padding: 2px 0 0;
+}
+.session .when, .session .what, .session .plan, .session .logged {
+  font-size: 13px; color: #323338; min-width: 0;
+}
+.session .plan, .session .logged { font-variant-numeric: tabular-nums; }
+.session .logged.miss { color: #e2445c; }
+.session .logged.wait { color: #676879; }
+.runline { display: block; overflow-wrap: anywhere; }
+.why { margin: 0; color: #676879; font-size: 13px; padding: 6px 0; }
 .empty { border-left: 6px solid var(--group); background: #f5f6f8; color: #676879;
   min-height: 40px; padding-left: 16px; display: flex; align-items: center; }
 footer { margin-top: 36px; color: #9699a6; font-size: 12px; line-height: 1.5; max-width: 720px; }
@@ -394,6 +528,39 @@ footer p { margin: 0; }
   h1 { font-size: 26px; }
   .top { flex-direction: column; align-items: flex-start; gap: 4px; }
   .subtitle { white-space: normal; }
+  .board-inner { min-width: 0; }
+  .colhead { display: none; }
+  .row {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    grid-template-areas:
+      "name pill"
+      "progress progress"
+      "distance distance";
+    row-gap: 2px;
+    padding-bottom: 6px;
+  }
+  .name { grid-area: name; }
+  .phase { display: none; }
+  .progress { grid-area: progress; padding: 0 12px 2px 34px; }
+  .bar { max-width: none; }
+  .metric { grid-area: distance; padding: 0 12px 2px 34px; }
+  .metric + .metric { display: none; }
+  .pill { grid-area: pill; width: auto; min-width: 104px; margin: 6px 8px 6px 0; }
+  .session.head { display: none; }
+  .session {
+    grid-template-columns: 58px minmax(0, 1fr) 104px;
+    grid-template-areas:
+      "when what spill"
+      "plan plan plan"
+      "logged logged logged";
+    gap: 2px 8px;
+    padding: 8px 0;
+  }
+  .session .when { grid-area: when; }
+  .session .what { grid-area: what; }
+  .session .spill { grid-area: spill; }
+  .session .plan { grid-area: plan; color: #676879; font-size: 12px; }
+  .session .logged { grid-area: logged; padding-bottom: 2px; }
 }
 """
 
@@ -411,11 +578,16 @@ def _countdown(race_date: datetime.date, today: datetime.date) -> str:
 
 def render(schedule_path: str, weekly_status_path: str, race_name: str,
            race_date: datetime.date, goal_pace: str,
-           today: datetime.date | None = None) -> str:
+           today: datetime.date | None = None,
+           runs_path: str | None = None) -> str:
     today = today or datetime.date.today()
-    weeks = build_weeks(schedule_path, weekly_status_path, race_date, today)
+    run_rows = None
+    if runs_path:
+        from training import status as status_mod
+        run_rows, _skipped = status_mod.load_strava_runs(runs_path)
+    weeks = build_weeks(schedule_path, weekly_status_path, race_date, today, run_rows=run_rows)
     grouped = group_weeks(weeks)
-    groups_html = "\n".join(_group(bucket, grouped[bucket]) for bucket in _GROUP_ORDER)
+    groups_html = "\n".join(_group(bucket, grouped[bucket], today) for bucket in _GROUP_ORDER)
     title = f"{race_name} training"
     subtitle = (f"{_esc(race_name)} · {race_date.strftime('%B')} {race_date.day}, "
                 f"{race_date.year} · goal pace {_esc(goal_pace)}/km")
@@ -444,7 +616,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
 {groups_html}
     </div></div>
     <footer>
-      <p>Completed stays collapsed until you open it. A week counts as completed at 85% of its planned distance, the same on-track bar as the status command. Actual kilometres are weekly totals from the logged run file. Updated {today.isoformat()}.</p>
+      <p>Every week shows logged kilometres against the plan. This week lists each planned session next to the run logged on that date. A past week counts as completed at 85% of its planned distance. Updated {today.isoformat()}.</p>
     </footer>
   </div>
 </body>

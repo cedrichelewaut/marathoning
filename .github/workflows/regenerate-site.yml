@@ -2,11 +2,13 @@ name: Regenerate site from logged runs
 
 # The daily updater only commits new rows to data/strava_runs.csv (via the
 # GitHub API; it does not run Python). This workflow regenerates the
-# aggregated totals and the page, then commits those outputs.
-#
+# aggregated totals and the page, commits those outputs, then deploys
+# GitHub Pages. A push made with the default GITHUB_TOKEN does not start
+# pages.yml, so this workflow publishes the regenerated docs/ itself.
+
 # Loop guard: the job never stages data/strava_runs.csv, so its push does
 # not match the path filter. Pushes made with the default GITHUB_TOKEN also
-# do not start a new workflow run.
+# do not start a new workflow run. deploy-pages does not push a commit.
 
 on:
   push:
@@ -17,6 +19,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: regenerate-site
@@ -37,6 +41,11 @@ jobs:
       - name: Regenerate weekly totals and the page
         run: python cli.py sync-site
 
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
       - name: Commit regenerated outputs
         run: |
           set -euo pipefail
@@ -53,3 +62,14 @@ jobs:
             git commit -m "Regenerate training site from logged runs"
             git push
           fi
+
+  deploy:
+    needs: regenerate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

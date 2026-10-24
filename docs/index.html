@@ -79,29 +79,40 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 }
 .fill { display: block; height: 100%; border-radius: 999px; }
 .fill.done { background: #00c875; }
-.fill.working { background: #579bfc; }
-.fill.stuck { background: #e2445c; }
+.fill.on-track { background: #579bfc; }
+.fill.behind { background: #e2445c; }
+.fill.not-started { background: #c4c4c4; }
 .pill {
   display: flex; align-items: center; justify-content: center;
   height: 30px; margin: 5px 8px 5px 0; border-radius: 4px;
   color: #fff; font-size: 14px; font-weight: 500; white-space: nowrap;
 }
 .pill.done { background: #00c875; }
-.pill.working { background: #fdab3d; }
-.pill.stuck { background: #e2445c; }
-.pill.planned { background: #c4c4c4; }
+.pill.on-track { background: #579bfc; }
+.pill.behind { background: #e2445c; }
+.pill.not-started { background: #c4c4c4; }
+.pill.sm { height: 26px; margin: 0; width: 100%; font-size: 13px; }
 .subitems {
   border-left: 6px solid var(--group); background: #fafbfc;
-  padding: 6px 16px 10px 34px; margin: 0 0 4px;
+  padding: 4px 16px 8px 34px; margin: 0 0 4px;
 }
-.sub {
-  display: grid; grid-template-columns: 72px minmax(160px, 1fr) auto;
-  gap: 8px 16px; align-items: baseline; padding: 4px 0;
+.session {
+  display: grid;
+  grid-template-columns: 72px minmax(150px, 1.4fr) minmax(120px, 1fr) minmax(180px, 1.5fr) 116px;
+  gap: 6px 12px; align-items: center; padding: 5px 0;
+  border-top: 1px solid #eceff3;
 }
-.when { color: #676879; font-size: 13px; }
-.what { color: #323338; font-size: 13px; }
-.how { color: #676879; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.why { margin: 0 0 6px 88px; color: #676879; font-size: 12px; line-height: 1.45; }
+.session.head {
+  border-top: 0; color: #676879; font-size: 12px; padding: 2px 0 0;
+}
+.session .when, .session .what, .session .plan, .session .logged {
+  font-size: 13px; color: #323338; min-width: 0;
+}
+.session .plan, .session .logged { font-variant-numeric: tabular-nums; }
+.session .logged.miss { color: #e2445c; }
+.session .logged.wait { color: #676879; }
+.runline { display: block; overflow-wrap: anywhere; }
+.why { margin: 0; color: #676879; font-size: 13px; padding: 6px 0; }
 .empty { border-left: 6px solid var(--group); background: #f5f6f8; color: #676879;
   min-height: 40px; padding-left: 16px; display: flex; align-items: center; }
 footer { margin-top: 36px; color: #9699a6; font-size: 12px; line-height: 1.5; max-width: 720px; }
@@ -112,6 +123,39 @@ footer p { margin: 0; }
   h1 { font-size: 26px; }
   .top { flex-direction: column; align-items: flex-start; gap: 4px; }
   .subtitle { white-space: normal; }
+  .board-inner { min-width: 0; }
+  .colhead { display: none; }
+  .row {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    grid-template-areas:
+      "name pill"
+      "progress progress"
+      "distance distance";
+    row-gap: 2px;
+    padding-bottom: 6px;
+  }
+  .name { grid-area: name; }
+  .phase { display: none; }
+  .progress { grid-area: progress; padding: 0 12px 2px 34px; }
+  .bar { max-width: none; }
+  .metric { grid-area: distance; padding: 0 12px 2px 34px; }
+  .metric + .metric { display: none; }
+  .pill { grid-area: pill; width: auto; min-width: 104px; margin: 6px 8px 6px 0; }
+  .session.head { display: none; }
+  .session {
+    grid-template-columns: 58px minmax(0, 1fr) 104px;
+    grid-template-areas:
+      "when what spill"
+      "plan plan plan"
+      "logged logged logged";
+    gap: 2px 8px;
+    padding: 8px 0;
+  }
+  .session .when { grid-area: when; }
+  .session .what { grid-area: what; }
+  .session .spill { grid-area: spill; }
+  .session .plan { grid-area: plan; color: #676879; font-size: 12px; }
+  .session .logged { grid-area: logged; padding-bottom: 2px; }
 }
 </style>
 </head>
@@ -140,9 +184,9 @@ footer p { margin: 0; }
   <span class="progress"><span class="bar" role="img" aria-label="0 of 17 kilometres"></span></span>
   <span class="metric">0/17 km</span>
   <span class="metric">0/11 km</span>
-  <span class="pill stuck">Stuck</span>
+  <span class="pill behind">Behind</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Sat 10</span><span class="what">Easy run (flexible day)</span><span class="how">6 km · 5:50/km · 35m</span></div><p class="why">extra kickstart run before the plan officially starts · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Sun 11</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">extra kickstart run before the plan officially starts · Comfortable aerobic running. Move it to whichever day suits you this week.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Sat 10</span><span class="what">Easy run (flexible day)</span><span class="plan">6 km · 5:50/km · 35m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div><div class="session"><span class="when">Sun 11</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
@@ -151,9 +195,9 @@ footer p { margin: 0; }
   <span class="progress"><span class="bar" role="img" aria-label="0 of 19 kilometres"></span></span>
   <span class="metric">0/19 km</span>
   <span class="metric">0/7 km</span>
-  <span class="pill stuck">Stuck</span>
+  <span class="pill behind">Behind</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 12</span><span class="what">Easy run (flexible day)</span><span class="how">6 km · 5:10/km · 31m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 13</span><span class="what">Easy run (flexible day)</span><span class="how">6 km · 5:10/km · 31m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 14</span><span class="what">Long run (flexible day)</span><span class="how">7 km · 5:43/km · 40m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 12</span><span class="what">Easy run (flexible day)</span><span class="plan">6 km · 5:10/km · 31m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div><div class="session"><span class="when">Tue 13</span><span class="what">Easy run (flexible day)</span><span class="plan">6 km · 5:10/km · 31m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div><div class="session"><span class="when">Wed 14</span><span class="what">Long run (flexible day)</span><span class="plan">7 km · 5:43/km · 40m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div></div>
 </details>
 </div>
 </details>
@@ -165,16 +209,16 @@ footer p { margin: 0; }
   <span></span><span>Phase</span><span>Progress</span><span>Distance</span><span>Long run</span><span>Status</span>
 </div>
 <div class="rows">
-<details class="item">
+<details class="item" open>
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Oct 19 – 25</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 20 kilometres"></span></span>
   <span class="metric">0/20 km</span>
   <span class="metric">0/8 km</span>
-  <span class="pill working">Working on it</span>
+  <span class="pill behind">Behind</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 19</span><span class="what">Easy run (flexible day)</span><span class="how">6 km · 5:40/km · 34m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 20</span><span class="what">Easy run (flexible day)</span><span class="how">6 km · 5:40/km · 34m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 21</span><span class="what">Long run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 19</span><span class="what">Easy run (flexible day)</span><span class="plan">6 km · 5:40/km · 34m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div><div class="session"><span class="when">Tue 20</span><span class="what">Easy run (flexible day)</span><span class="plan">6 km · 5:40/km · 34m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div><div class="session"><span class="when">Wed 21</span><span class="what">Long run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged miss">No run logged</span><span class="spill"><span class="pill sm behind">Behind</span></span></div></div>
 </details>
 </div>
 </details>
@@ -191,292 +235,292 @@ footer p { margin: 0; }
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Oct 26 – Nov 1</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 25 kilometres"></span></span>
-  <span class="metric">25 km</span>
-  <span class="metric">9 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/25 km</span>
+  <span class="metric">0/9 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 26</span><span class="what">Easy run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 27</span><span class="what">Easy run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 28</span><span class="what">Long run (flexible day)</span><span class="how">9 km · 5:33/km · 50m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 26</span><span class="what">Easy run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 27</span><span class="what">Easy run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 28</span><span class="what">Long run (flexible day)</span><span class="plan">9 km · 5:33/km · 50m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Nov 2 – 8</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 25 kilometres"></span></span>
-  <span class="metric">25 km</span>
-  <span class="metric">9 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/25 km</span>
+  <span class="metric">0/9 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 2</span><span class="what">Easy run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 3</span><span class="what">Easy run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 4</span><span class="what">Long run (flexible day)</span><span class="how">9 km · 5:33/km · 50m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 2</span><span class="what">Easy run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 3</span><span class="what">Easy run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 4</span><span class="what">Long run (flexible day)</span><span class="plan">9 km · 5:33/km · 50m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Nov 9 – 15</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 26 kilometres"></span></span>
-  <span class="metric">26 km</span>
-  <span class="metric">10 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/26 km</span>
+  <span class="metric">0/10 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 9</span><span class="what">Easy run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 10</span><span class="what">Easy run (flexible day)</span><span class="how">8 km · 5:38/km · 45m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 11</span><span class="what">Long run (flexible day)</span><span class="how">10 km · 5:30/km · 55m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 9</span><span class="what">Easy run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 10</span><span class="what">Easy run (flexible day)</span><span class="plan">8 km · 5:38/km · 45m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 11</span><span class="what">Long run (flexible day)</span><span class="plan">10 km · 5:30/km · 55m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Nov 16 – 22</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 34 kilometres"></span></span>
-  <span class="metric">34 km</span>
-  <span class="metric">12 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/34 km</span>
+  <span class="metric">0/12 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 16</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 17</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 18</span><span class="what">Long run (flexible day)</span><span class="how">12 km · 5:25/km · 65m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 16</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 17</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 18</span><span class="what">Long run (flexible day)</span><span class="plan">12 km · 5:25/km · 65m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Nov 23 – 29</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 34 kilometres"></span></span>
-  <span class="metric">34 km</span>
-  <span class="metric">12 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/34 km</span>
+  <span class="metric">0/12 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 23</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 24</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 25</span><span class="what">Long run (flexible day)</span><span class="how">12 km · 5:25/km · 65m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 23</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 24</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 25</span><span class="what">Long run (flexible day)</span><span class="plan">12 km · 5:25/km · 65m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Nov 30 – Dec 6</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 34 kilometres"></span></span>
-  <span class="metric">34 km</span>
-  <span class="metric">12 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/34 km</span>
+  <span class="metric">0/12 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 30</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 1</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 2</span><span class="what">Long run (flexible day)</span><span class="how">12 km · 5:25/km · 65m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 30</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 1</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 2</span><span class="what">Long run (flexible day)</span><span class="plan">12 km · 5:25/km · 65m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Dec 7 – 13</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 40 kilometres"></span></span>
-  <span class="metric">40 km</span>
-  <span class="metric">14 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/40 km</span>
+  <span class="metric">0/14 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 7</span><span class="what">Easy run (flexible day)</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 8</span><span class="what">Easy run (flexible day)</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 9</span><span class="what">Long run (flexible day)</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 7</span><span class="what">Easy run (flexible day)</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 8</span><span class="what">Easy run (flexible day)</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 9</span><span class="what">Long run (flexible day)</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Dec 14 – 20</span>
   <span class="phase" title="Base-building">Base-building</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 37 kilometres"></span></span>
-  <span class="metric">37 km</span>
-  <span class="metric">15 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/37 km</span>
+  <span class="metric">0/15 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Mon 14</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Tue 15</span><span class="what">Easy run (flexible day)</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">move to whichever day suits you this week · Comfortable aerobic running. Move it to whichever day suits you this week.</p><div class="sub"><span class="when">Wed 16</span><span class="what">Long run (flexible day)</span><span class="how">15 km · 5:20/km · 80m</span></div><p class="why">move to whichever day suits you this week · The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Mon 14</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Tue 15</span><span class="what">Easy run (flexible day)</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 16</span><span class="what">Long run (flexible day)</span><span class="plan">15 km · 5:20/km · 80m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Dec 21 – 27</span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 54 kilometres"></span></span>
-  <span class="metric">54 km</span>
-  <span class="metric">18 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/54 km</span>
+  <span class="metric">0/18 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 22</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 23</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 25</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 27</span><span class="what">Long run</span><span class="how">18 km · 5:17/km · 95m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 22</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 23</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 25</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 27</span><span class="what">Long run</span><span class="plan">18 km · 5:17/km · 95m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Dec 28, 2026 – Jan 3, 2027</span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 55 kilometres"></span></span>
-  <span class="metric">55 km</span>
-  <span class="metric">19 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/55 km</span>
+  <span class="metric">0/19 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 29</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 30</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 1</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 3</span><span class="what">Long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 29</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 30</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 1</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 3</span><span class="what">Long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Jan 4 – 10</span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 55 kilometres"></span></span>
-  <span class="metric">55 km</span>
-  <span class="metric">19 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/55 km</span>
+  <span class="metric">0/19 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 5</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 6</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 8</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 10</span><span class="what">Long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 5</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 6</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 8</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 10</span><span class="what">Long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Jan 11 – 17</span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 55 kilometres"></span></span>
-  <span class="metric">55 km</span>
-  <span class="metric">19 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/55 km</span>
+  <span class="metric">0/19 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 12</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 13</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 15</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 17</span><span class="what">Long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 12</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 13</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 15</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 17</span><span class="what">Long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Jan 18 – 24</span>
   <span class="phase" title="Endurance">Endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 55 kilometres"></span></span>
-  <span class="metric">55 km</span>
-  <span class="metric">19 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/55 km</span>
+  <span class="metric">0/19 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 19</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 20</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 22</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 24</span><span class="what">Long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 19</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 20</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 22</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 24</span><span class="what">Long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Jan 25 – 31</span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 56 kilometres"></span></span>
-  <span class="metric">56 km</span>
-  <span class="metric">20 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/56 km</span>
+  <span class="metric">0/20 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 26</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 27</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 29</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 31</span><span class="what">Long run</span><span class="how">20 km · 5:30/km · 110m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 26</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 27</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 29</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 31</span><span class="what">Long run</span><span class="plan">20 km · 5:30/km · 110m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Feb 1 – 7</span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 56 kilometres"></span></span>
-  <span class="metric">56 km</span>
-  <span class="metric">20 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/56 km</span>
+  <span class="metric">0/20 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 2</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 3</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 5</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 7</span><span class="what">Long run</span><span class="how">20 km · 5:30/km · 110m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 2</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 3</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 5</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 7</span><span class="what">Long run</span><span class="plan">20 km · 5:30/km · 110m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Feb 8 – 14</span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 62 kilometres"></span></span>
-  <span class="metric">62 km</span>
-  <span class="metric">22 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/62 km</span>
+  <span class="metric">0/22 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 9</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 10</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 12</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 14</span><span class="what">Long run</span><span class="how">22 km · 5:27/km · 120m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 9</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 10</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 12</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 14</span><span class="what">Long run</span><span class="plan">22 km · 5:27/km · 120m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Feb 15 – 21</span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 68 kilometres"></span></span>
-  <span class="metric">68 km</span>
-  <span class="metric">25 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/68 km</span>
+  <span class="metric">0/25 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 16</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 17</span><span class="what">Medium-long run</span><span class="how">17 km · 5:18/km · 90m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 19</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 21</span><span class="what">Long run</span><span class="how">25 km · 5:24/km · 135m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 16</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 17</span><span class="what">Medium-long run</span><span class="plan">17 km · 5:18/km · 90m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 19</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 21</span><span class="what">Long run</span><span class="plan">25 km · 5:24/km · 135m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Feb 22 – 28</span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 76 kilometres"></span></span>
-  <span class="metric">76 km</span>
-  <span class="metric">24 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/76 km</span>
+  <span class="metric">0/24 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 23</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 24</span><span class="what">Medium-long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 26</span><span class="what">Recovery + optional strides</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">strides are relaxed and quick, not a sprint, not required · Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</p><div class="sub"><span class="when">Sat 27</span><span class="what">Recovery</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</p><div class="sub"><span class="when">Sun 28</span><span class="what">Long run</span><span class="how">24 km · 5:25/km · 130m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 23</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 24</span><span class="what">Medium-long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 26</span><span class="what">Recovery + optional strides</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sat 27</span><span class="what">Recovery</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 28</span><span class="what">Long run</span><span class="plan">24 km · 5:25/km · 130m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mar 1 – 7</span>
   <span class="phase" title="LT+endurance (adapted: general aerobic)">LT + endurance</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 68 kilometres"></span></span>
-  <span class="metric">68 km</span>
-  <span class="metric">25 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/68 km</span>
+  <span class="metric">0/25 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 2</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 3</span><span class="what">Medium-long run</span><span class="how">17 km · 5:18/km · 90m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 5</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 7</span><span class="what">Long run</span><span class="how">25 km · 5:24/km · 135m</span></div><p class="why">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 2</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 3</span><span class="what">Medium-long run</span><span class="plan">17 km · 5:18/km · 90m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 5</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 7</span><span class="what">Long run</span><span class="plan">25 km · 5:24/km · 135m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mar 8 – 14</span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 76 kilometres"></span></span>
-  <span class="metric">76 km</span>
-  <span class="metric">24 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/76 km</span>
+  <span class="metric">0/24 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 9</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 10</span><span class="what">Medium-long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 12</span><span class="what">Recovery + optional strides</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">strides are relaxed and quick, not a sprint, not required · Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</p><div class="sub"><span class="when">Sat 13</span><span class="what">Recovery</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</p><div class="sub"><span class="when">Sun 14</span><span class="what">Long run</span><span class="how">24 km · 5:00/km · 120m</span></div><p class="why">include ~13 km at marathon pace (4:30/km), rest easy · The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 9</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 10</span><span class="what">Medium-long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 12</span><span class="what">Recovery + optional strides</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sat 13</span><span class="what">Recovery</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 14</span><span class="what">Long run</span><span class="plan">24 km · 5:00/km · 120m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mar 15 – 21</span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 90 kilometres"></span></span>
-  <span class="metric">90 km</span>
-  <span class="metric">32 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/90 km</span>
+  <span class="metric">0/32 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 16</span><span class="what">General aerobic</span><span class="how">16 km · 5:38/km · 90m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 17</span><span class="what">Medium-long run</span><span class="how">22 km · 5:27/km · 120m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 19</span><span class="what">Recovery + optional strides</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">strides are relaxed and quick, not a sprint, not required · Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</p><div class="sub"><span class="when">Sat 20</span><span class="what">Recovery</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</p><div class="sub"><span class="when">Sun 21</span><span class="what">Long run</span><span class="how">32 km · 4:51/km · 155m</span></div><p class="why">include ~18 km at marathon pace (4:30/km), rest easy · The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 16</span><span class="what">General aerobic</span><span class="plan">16 km · 5:38/km · 90m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 17</span><span class="what">Medium-long run</span><span class="plan">22 km · 5:27/km · 120m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 19</span><span class="what">Recovery + optional strides</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sat 20</span><span class="what">Recovery</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 21</span><span class="what">Long run</span><span class="plan">32 km · 4:51/km · 155m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mar 22 – 28</span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 82 kilometres"></span></span>
-  <span class="metric">82 km</span>
-  <span class="metric">30 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/82 km</span>
+  <span class="metric">0/30 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 23</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 24</span><span class="what">Medium-long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 26</span><span class="what">Recovery + optional strides</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">strides are relaxed and quick, not a sprint, not required · Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</p><div class="sub"><span class="when">Sat 27</span><span class="what">Recovery</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</p><div class="sub"><span class="when">Sun 28</span><span class="what">Long run</span><span class="how">30 km · 5:00/km · 150m</span></div><p class="why">include ~16 km at marathon pace (4:30/km), rest easy · The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 23</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 24</span><span class="what">Medium-long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 26</span><span class="what">Recovery + optional strides</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sat 27</span><span class="what">Recovery</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 28</span><span class="what">Long run</span><span class="plan">30 km · 5:00/km · 150m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mar 29 – Apr 4</span>
   <span class="phase" title="Race preparation">Race prep</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 83 kilometres"></span></span>
-  <span class="metric">83 km</span>
-  <span class="metric">28 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/83 km</span>
+  <span class="metric">0/28 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 30</span><span class="what">General aerobic</span><span class="how">16 km · 5:38/km · 90m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 31</span><span class="what">Medium-long run</span><span class="how">19 km · 5:32/km · 105m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 2</span><span class="what">Recovery + optional strides</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">strides are relaxed and quick, not a sprint, not required · Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</p><div class="sub"><span class="when">Sat 3</span><span class="what">Recovery</span><span class="how">10 km · 6:00/km · 60m</span></div><p class="why">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</p><div class="sub"><span class="when">Sun 4</span><span class="what">Long run</span><span class="how">28 km · 5:00/km · 140m</span></div><p class="why">include ~15 km at marathon pace (4:30/km), rest easy · The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 30</span><span class="what">General aerobic</span><span class="plan">16 km · 5:38/km · 90m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 31</span><span class="what">Medium-long run</span><span class="plan">19 km · 5:32/km · 105m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 2</span><span class="what">Recovery + optional strides</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sat 3</span><span class="what">Recovery</span><span class="plan">10 km · 6:00/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 4</span><span class="what">Long run</span><span class="plan">28 km · 5:00/km · 140m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Apr 5 – 11</span>
   <span class="phase" title="Taper">Taper</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 70 kilometres"></span></span>
-  <span class="metric">70 km</span>
-  <span class="metric">27 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/70 km</span>
+  <span class="metric">0/27 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 6</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 7</span><span class="what">Medium-long run</span><span class="how">17 km · 5:18/km · 90m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 9</span><span class="what">General aerobic</span><span class="how">13 km · 5:46/km · 75m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 11</span><span class="what">Long run</span><span class="how">27 km · 4:49/km · 130m</span></div><p class="why">include ~15 km at marathon pace (4:30/km), rest easy · The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 6</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 7</span><span class="what">Medium-long run</span><span class="plan">17 km · 5:18/km · 90m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 9</span><span class="what">General aerobic</span><span class="plan">13 km · 5:46/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 11</span><span class="what">Long run</span><span class="plan">27 km · 4:49/km · 130m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Apr 12 – 18</span>
   <span class="phase" title="Taper">Taper</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 51 kilometres"></span></span>
-  <span class="metric">51 km</span>
-  <span class="metric">15 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/51 km</span>
+  <span class="metric">0/15 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Tue 13</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Wed 14</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 16</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 18</span><span class="what">Long run</span><span class="how">15 km · 5:00/km · 75m</span></div><p class="why">include ~8 km at marathon pace (4:30/km), rest easy · The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Tue 13</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Wed 14</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 16</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 18</span><span class="what">Long run</span><span class="plan">15 km · 5:00/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 <details class="item">
 <summary class="row">
   <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Apr 19 – 25 · Race</span>
   <span class="phase" title="Taper">Taper</span>
   <span class="progress"><span class="bar" role="img" aria-label="0 of 67.2 kilometres"></span></span>
-  <span class="metric">67.2 km</span>
-  <span class="metric">42.2 km</span>
-  <span class="pill planned">Planned</span>
+  <span class="metric">0/67.2 km</span>
+  <span class="metric">0/42.2 km</span>
+  <span class="pill not-started">Not started</span>
 </summary>
-<div class="subitems"><div class="sub"><span class="when">Wed 21</span><span class="what">Medium-long run</span><span class="how">14 km · 5:21/km · 75m</span></div><p class="why">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</p><div class="sub"><span class="when">Fri 23</span><span class="what">General aerobic</span><span class="how">11 km · 5:27/km · 60m</span></div><p class="why">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</p><div class="sub"><span class="when">Sun 25</span><span class="what">Goal marathon</span><span class="how">42.2 km · 4:30/km</span></div><p class="why">race day · Race day. Hold your planned pace, especially through the first 10K; it&#x27;s easy to go out too fast.</p></div>
+<div class="subitems"><div class="session head"><span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Status</span></div><div class="session"><span class="when">Wed 21</span><span class="what">Medium-long run</span><span class="plan">14 km · 5:21/km · 75m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Fri 23</span><span class="what">General aerobic</span><span class="plan">11 km · 5:27/km · 60m</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div><div class="session"><span class="when">Sun 25</span><span class="what">Goal marathon</span><span class="plan">42.2 km · 4:30/km</span><span class="logged wait">Not yet</span><span class="spill"><span class="pill sm not-started">Not started</span></span></div></div>
 </details>
 </div>
 </details>
     </div></div>
     <footer>
-      <p>Completed stays collapsed until you open it. A week counts as completed at 85% of its planned distance, the same on-track bar as the status command. Actual kilometres are weekly totals from the logged run file. Updated 2026-10-24.</p>
+      <p>Every week shows logged kilometres against the plan. This week lists each planned session next to the run logged on that date. A past week counts as completed at 85% of its planned distance. Updated 2026-10-24.</p>
     </footer>
   </div>
 </body>

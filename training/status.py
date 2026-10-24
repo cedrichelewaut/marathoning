@@ -100,7 +100,12 @@ def load_strava_runs(path: str) -> tuple[list[dict], int]:
                 raise ValueError(
                     f"{path}:{line_no}: moving_time must be h:mm:ss, got {moving!r}."
                 )
-            runs.append({"date": date_text, "distance_km": f"{distance:.4f}"})
+            runs.append({
+                "date": date_text,
+                "name": (row.get("name") or "").strip(),
+                "distance_km": f"{distance:.4f}",
+                "moving_time": moving,
+            })
     return runs, skipped
 
 

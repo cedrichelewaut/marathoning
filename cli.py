@@ -10,7 +10,7 @@ Commands:
                                  (data/weekly_status.csv) from data/strava_runs.csv
     sync-site                   Rebuild weekly status and docs/index.html
                                  from data/strava_runs.csv. Idempotent.
-    render-site                 Build docs/index.html from the weekly status file
+    render-site                 Build docs/index.html from weekly status and the run log
     predict --time T --distance D [--goal]
                                  Predict finish times / show training paces
 """
@@ -154,6 +154,7 @@ def cmd_render_site(args: argparse.Namespace) -> None:
         race_name=cfg["race"]["name"],
         race_date=_as_date(cfg["race"]["date"]),
         goal_pace=cfg["goal"]["pace_per_km"],
+        runs_path=STRAVA_RUNS_PATH,
     )
     with open(SITE_OUT_PATH, "w") as f:
         f.write(html_out)
