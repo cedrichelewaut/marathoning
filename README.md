@@ -34,8 +34,30 @@ kept but marked optional.
 
 ## Logging actual runs
 
-Export your activities from Strava (bulk export) or Garmin Connect
-(Activities list -> Export CSV), then:
+### Strava (recommended — works for Coros/Garmin too if they auto-sync to Strava)
+
+One-time setup:
+
+1. Go to https://www.strava.com/settings/api and create an API application.
+   "Authorization Callback Domain" can just be `localhost`.
+2. Note the Client ID and Client Secret it gives you.
+3. Run `python cli.py strava-auth`, paste in the Client ID/Secret when asked,
+   open the printed URL, click Authorize, then paste the URL you land on
+   (it 404s, that's fine — the `code=` in its address bar is what matters)
+   back into the prompt.
+
+This saves a token to `data/strava_auth.json` (gitignored — it holds your
+API secret, never commit it). After that, any time you want to pull in
+recent runs:
+
+```
+python cli.py sync-strava
+```
+
+Pulls everything since the last sync (or the last 30 days on first run,
+override with `--days`), skipping duplicates.
+
+### Manual export (Strava bulk export or Garmin Connect CSV)
 
 ```
 python cli.py import-runs path/to/export.csv --source strava   # or garmin
@@ -71,8 +93,8 @@ Uses Jack Daniels' VDOT formula plus a Riegel-formula cross-check.
 
 ## Publishing the schedule to GitHub Pages
 
-After `import-runs` (or any time you want the public page to reflect
-current progress):
+After `sync-strava` or `import-runs` (or any time you want the public page
+to reflect current progress):
 
 ```
 python cli.py sync-status   # writes data/weekly_status.csv (aggregated, no raw runs)

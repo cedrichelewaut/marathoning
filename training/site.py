@@ -30,10 +30,29 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
     status_by_week = status_mod.load_weekly_status(weekly_status_path)
     today = datetime.date.today()
 
+    block_info = {
+        "build-up": ("Build-Up Phase", "Easy, flexible mileage build-up from a low "
+                     "base, coming off a break. No fixed structure, just aerobic volume."),
+        "book": ("18-Week Marathon Plan", "Structured block adapted from Pete "
+                 "Pfitzinger's Advanced Marathoning (“Up to 55 Miles per Week”), "
+                 "with every speed/interval session swapped for general-aerobic or "
+                 "marathon-pace running."),
+    }
+
     rows_html = []
+    prev_block = None
     for week_start in sorted(weeks_by_start):
         days = sorted(weeks_by_start[week_start], key=lambda r: r["date"])
         phase = days[0]["phase"]
+        block = "build-up" if phase == "Base-building" else "book"
+        if block != prev_block:
+            title, desc = block_info[block]
+            rows_html.append(f"""
+        <div class="block-divider">
+          <h2>{html.escape(title)}</h2>
+          <p>{html.escape(desc)}</p>
+        </div>""")
+            prev_block = block
         total_km = sum(float(d["distance_km"]) for d in days if d["distance_km"])
         st = status_by_week.get(week_start.isoformat())
 
@@ -44,13 +63,18 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
         else:
             badge = ("no-data", "")
 
+        run_days = [d for d in days if d["workout"] != "Rest or cross-train"]
         day_cells = "".join(
-            f'<li><span class="d">{datetime.date.fromisoformat(d["date"]).strftime("%a")}</span> '
+            f'<li><span class="d">Run {i}</span> '
             f'<span class="w">{html.escape(d["workout"])}</span>'
             + (f' <span class="km">{d["distance_km"]} km</span>' if d["distance_km"] else "")
+            + (f' <span class="pace">@ {html.escape(d["pace_per_km"])}/km'
+               + (f', ~{html.escape(d["duration"])}' if d["duration"] else "") + '</span>'
+               if d.get("pace_per_km") else "")
             + (f'<div class="notes">{html.escape(d["notes"])}</div>' if d["notes"] else "")
+            + (f'<div class="explain">{html.escape(d["explanation"])}</div>' if d["explanation"] else "")
             + "</li>"
-            for d in days
+            for i, d in enumerate(run_days, 1)
         )
 
         rows_html.append(f"""
@@ -58,7 +82,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
           <header>
             <h2>Week of {week_start.strftime("%b %d, %Y")}</h2>
             <span class="phase">{html.escape(phase)}</span>
-            <span class="total">{total_km:.0f} km planned</span>
+            <span class="total">{len(run_days)} runs, {total_km:.0f} km planned</span>
             {f'<span class="status">{badge[0].replace("-", " ")} ({badge[1]})</span>' if badge[1] else f'<span class="status">{badge[0].replace("-", " ")}</span>'}
           </header>
           <ul class="days">{day_cells}</ul>
@@ -102,9 +126,15 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
   .week.upcoming .status {{ background: transparent; color: var(--upcoming); }}
   ul.days {{ list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }}
   ul.days li {{ font-size: 0.9rem; padding: 2px 0; }}
-  .d {{ color: var(--muted); width: 2.4em; display: inline-block; }}
+  .d {{ color: var(--muted); width: 3.6em; display: inline-block; }}
   .km {{ color: var(--muted); }}
-  .notes {{ color: var(--muted); font-size: 0.8rem; margin-left: 2.4em; }}
+  .pace {{ color: var(--accent); font-size: 0.85rem; }}
+  .notes {{ color: var(--muted); font-size: 0.8rem; margin-left: 3.6em; }}
+  .explain {{ color: var(--muted); font-size: 0.8rem; margin-left: 3.6em; margin-top: 2px; }}
+  .block-divider {{ margin: 36px 0 18px; padding-top: 18px; border-top: 2px solid var(--accent); }}
+  .block-divider:first-of-type {{ margin-top: 0; padding-top: 0; border-top: none; }}
+  .block-divider h2 {{ font-size: 1.1rem; margin: 0 0 4px; }}
+  .block-divider p {{ color: var(--muted); font-size: 0.85rem; margin: 0; }}
   [hidden] {{ display: none !important; }}
 </style>
 </head>

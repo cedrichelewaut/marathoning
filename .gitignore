@@ -9,3 +9,6 @@ books/
 # Raw per-run log (from Strava/Garmin exports) stays local only.
 # schedule.csv and weekly_status.csv (aggregated) are tracked and published.
 data/runs.csv
+
+# Strava API client secret + tokens. Never commit this.
+data/strava_auth.json

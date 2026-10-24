@@ -88,12 +88,16 @@ def training_paces(vdot: float) -> TrainingPaces:
     return TrainingPaces(easy_min_per_km=(easy_fast, easy_slow), marathon_min_per_km=marathon)
 
 
-def format_pace(min_per_km: float) -> str:
+def format_pace_bare(min_per_km: float) -> str:
     minutes = int(min_per_km)
     seconds = round((min_per_km - minutes) * 60)
     if seconds == 60:
         minutes, seconds = minutes + 1, 0
-    return f"{minutes}:{seconds:02d}/km"
+    return f"{minutes}:{seconds:02d}"
+
+
+def format_pace(min_per_km: float) -> str:
+    return f"{format_pace_bare(min_per_km)}/km"
 
 
 def format_time(minutes: float) -> str:

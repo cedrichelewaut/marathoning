@@ -13,12 +13,30 @@ training:
   # Anything between today and this date is base-building (flexible, easy
   # mileage build-up, no structured workouts).
   plan_18wk_start: 2026-12-21
-  # Peak weekly mileage for the race-specific plan (km). 55 mi/wk ~= 89 km,
-  # the top of the book's "Up to 55 Miles per Week" track.
+  # Peak weekly mileage for the 18-week block (km): 55 mi/wk, the top of
+  # the book's "Up to 55 Miles per Week" track.
   peak_weekly_km: 89
-  start_weekly_km: 53
-  # Base-building starting weekly volume (km) for the first base week.
-  base_building_start_km: 25
+  # What the 18-week block itself starts at (km): 33 mi/wk, the book's own
+  # number. The 18-week block always follows this exact book progression
+  # (race_block_start_km -> peak_weekly_km), unmodified.
+  race_block_start_km: 53
+  # Base-building starting weekly volume (km) for the very first week,
+  # coming off a break - this ramps up at a conservative, capped rate,
+  # separately from the book's own 18-week progression above.
+  base_building_start_km: 18
+  # The book's own prerequisite before starting the 18-week block: "at
+  # least 25 mi/wk (40 km)" total, with a long run "close in length to"
+  # the first week's 12 mi (19 km), both achieved in the last month
+  # beforehand (40 km / 19 km). These are set 10% lighter than that, by
+  # request, to keep the on-ramp a bit easier - 38 km total lands just
+  # under the book's 40 km floor, 17 km long run just under its ~19 km.
+  base_building_final_total_km: 38
+  base_building_final_long_km: 17
+  # All non-marathon-pace paces (long run, medium-long, general aerobic,
+  # recovery) are derived directly from goal.pace_per_km, as percentages
+  # slower than it (see _PACE_PCT_SLOWER in training/schedule.py) - this
+  # is how the book itself defines them (chapter 1, table 1.1), not a
+  # separate pace estimate. Used for base-building too, same system.
   # If true (your preference), replace every LT/VO2max/hill-sprint session
   # with marathon-pace or general-aerobic running. Short strides are kept
   # but marked optional since they're brief enough not to count as real

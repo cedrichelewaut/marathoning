@@ -9,6 +9,8 @@ Commands:
     sync-status                 Write aggregated weekly status for all weeks
                                  (data/weekly_status.csv, safe to publish)
     render-site                 Build docs/index.html for GitHub Pages
+    strava-auth                 One-time Strava API authorization
+    sync-strava [--days N]       Pull recent runs from Strava into data/runs.csv
     predict --time T --distance D [--goal]
                                  Predict finish times / show training paces
 """
@@ -20,7 +22,7 @@ import datetime
 
 import yaml
 
-from training import importers, predict, schedule, site, status
+from training import importers, predict, schedule, site, status, strava
 
 CONFIG_PATH = "config.yaml"
 SCHEDULE_PATH = "data/schedule.csv"
@@ -42,20 +44,44 @@ def cmd_generate_schedule(args: argparse.Namespace) -> None:
     cfg = load_config()
     race_date = _as_date(cfg["race"]["date"])
     plan_start = _as_date(cfg["training"]["plan_18wk_start"])
+    peak_km = cfg["training"]["peak_weekly_km"]
     today = datetime.date.today()
+    mp_pace = predict.parse_pace_to_min_per_km(cfg["goal"]["pace_per_km"])
+
+    base_start = status.current_week_start(today) + datetime.timedelta(weeks=1)
+    n_base_weeks = max(0, (plan_start - base_start).days // 7)
+    n_race_weeks = ((race_date - plan_start).days // 7) + 1
+    race_start_km = cfg["training"]["race_block_start_km"]
+
+    # The 18-week block follows the book's own progression (race_start_km
+    # -> peak_km) unmodified. Base-building ramps from near zero toward
+    # the book's own stated prerequisite for starting that block: at
+    # least 25 mi/wk (40 km) total, with a long run close to the first
+    # week's 12 mi (19 km), achieved in "the last month" beforehand. No
+    # cutback weeks here (unlike generate_book_progression's), a 10-week
+    # on-ramp doesn't leave room for them and still hit that target.
+    base_total_target = cfg["training"]["base_building_final_total_km"]
+    base_long_target = cfg["training"]["base_building_final_long_km"]
+    base_totals = schedule.generate_mileage_ramp(
+        start_km=cfg["training"]["base_building_start_km"],
+        peak_km=base_total_target, n_weeks=n_base_weeks,
+        recovery_every=n_base_weeks + 1,
+    )
+    base_long_runs = schedule.generate_mileage_ramp(
+        start_km=round(cfg["training"]["base_building_start_km"] * 0.4),
+        peak_km=base_long_target, n_weeks=n_base_weeks,
+        recovery_every=n_base_weeks + 1,
+    )
+    race_totals = schedule.generate_book_progression(
+        start_km=race_start_km, peak_km=peak_km, n_weeks=n_race_weeks,
+    )
 
     base_weeks = schedule.generate_base_building(
-        start_date=status.current_week_start(today) + datetime.timedelta(weeks=1),
-        end_before=plan_start,
-        start_km=cfg["training"]["base_building_start_km"],
-        target_km=cfg["training"]["start_weekly_km"],
-        peak_km=cfg["training"]["peak_weekly_km"],
+        start_date=base_start, weekly_totals=base_totals, weekly_long_runs=base_long_runs,
+        peak_km=peak_km, mp_pace=mp_pace,
     )
     race_weeks = schedule.generate_18wk_plan(
-        plan_start=plan_start,
-        race_date=race_date,
-        start_km=cfg["training"]["start_weekly_km"],
-        peak_km=cfg["training"]["peak_weekly_km"],
+        plan_start=plan_start, weekly_totals=race_totals, peak_km=peak_km, mp_pace=mp_pace,
     )
     all_weeks = base_weeks + race_weeks
     schedule.write_schedule_csv(SCHEDULE_PATH, all_weeks)
@@ -63,6 +89,8 @@ def cmd_generate_schedule(args: argparse.Namespace) -> None:
           f"to {SCHEDULE_PATH}")
     print(f"Base-building: {len(base_weeks)} weeks, then the 18-week race-specific "
           f"block from {plan_start} to race day {race_date}.")
+    print(f"Marathon pace: {predict.format_pace(mp_pace)} (all other paces derived from this, "
+          f"per the book's Table 1.1 percentages)")
 
 
 def cmd_import_runs(args: argparse.Namespace) -> None:
@@ -73,6 +101,46 @@ def cmd_import_runs(args: argparse.Namespace) -> None:
     n = importers.write_runs_csv(RUNS_PATH, runs, append=True)
     print(f"Parsed {len(runs)} runs from {args.file}, added {n} new (skipped duplicates) "
           f"to {RUNS_PATH}")
+
+
+def cmd_strava_auth(args: argparse.Namespace) -> None:
+    existing = strava.load_auth()
+    if existing and not args.force:
+        print("Already authorized (data/strava_auth.json exists). Pass --force to redo it.")
+        return
+    client_id = input("Strava Client ID (from strava.com/settings/api): ").strip()
+    client_secret = input("Strava Client Secret: ").strip()
+    print("\nOpen this URL, click Authorize, then copy the FULL URL you land on "
+          "(it will 404, that's expected, just copy the address bar):\n")
+    print(strava.authorize_url(client_id))
+    redirected = input("\nPaste the full redirected URL (or just the code= value): ").strip()
+    if "code=" in redirected:
+        code = redirected.split("code=")[1].split("&")[0]
+    else:
+        code = redirected
+    auth = strava.exchange_code(client_id, client_secret, code)
+    strava.save_auth(auth)
+    print(f"\nSaved to {strava.AUTH_PATH} (gitignored, never commit this file). "
+          "Run `python cli.py sync-strava` any time to pull recent runs.")
+
+
+def cmd_sync_strava(args: argparse.Namespace) -> None:
+    auth = strava.load_auth()
+    if not auth:
+        raise SystemExit("Not authorized yet. Run `python cli.py strava-auth` first.")
+    auth = strava.ensure_access_token(auth)
+
+    if auth.get("last_sync_epoch"):
+        after_epoch = auth["last_sync_epoch"]
+    else:
+        after_epoch = int((datetime.datetime.now() - datetime.timedelta(days=args.days)).timestamp())
+
+    activities = strava.fetch_runs(auth, after_epoch)
+    runs = strava.to_run_records(activities)
+    n = importers.write_runs_csv(RUNS_PATH, runs, append=True)
+    auth["last_sync_epoch"] = int(datetime.datetime.now().timestamp())
+    strava.save_auth(auth)
+    print(f"Pulled {len(runs)} runs from Strava, added {n} new (skipped duplicates) to {RUNS_PATH}")
 
 
 def cmd_status(args: argparse.Namespace) -> None:
@@ -162,6 +230,15 @@ def main() -> None:
 
     sub.add_parser("sync-status").set_defaults(func=cmd_sync_status)
     sub.add_parser("render-site").set_defaults(func=cmd_render_site)
+
+    p_strava_auth = sub.add_parser("strava-auth")
+    p_strava_auth.add_argument("--force", action="store_true", help="Redo authorization")
+    p_strava_auth.set_defaults(func=cmd_strava_auth)
+
+    p_sync_strava = sub.add_parser("sync-strava")
+    p_sync_strava.add_argument("--days", type=int, default=30,
+                                help="On first sync, how many days back to pull (default 30)")
+    p_sync_strava.set_defaults(func=cmd_sync_strava)
 
     p_predict = sub.add_parser("predict")
     p_predict.add_argument("--time", help="Result time, e.g. 19:30 or 1:45:00")

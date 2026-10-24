@@ -34,9 +34,15 @@
   .week.upcoming .status { background: transparent; color: var(--upcoming); }
   ul.days { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
   ul.days li { font-size: 0.9rem; padding: 2px 0; }
-  .d { color: var(--muted); width: 2.4em; display: inline-block; }
+  .d { color: var(--muted); width: 3.6em; display: inline-block; }
   .km { color: var(--muted); }
-  .notes { color: var(--muted); font-size: 0.8rem; margin-left: 2.4em; }
+  .pace { color: var(--accent); font-size: 0.85rem; }
+  .notes { color: var(--muted); font-size: 0.8rem; margin-left: 3.6em; }
+  .explain { color: var(--muted); font-size: 0.8rem; margin-left: 3.6em; margin-top: 2px; }
+  .block-divider { margin: 36px 0 18px; padding-top: 18px; border-top: 2px solid var(--accent); }
+  .block-divider:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  .block-divider h2 { font-size: 1.1rem; margin: 0 0 4px; }
+  .block-divider p { color: var(--muted); font-size: 0.85rem; margin: 0; }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -46,257 +52,274 @@
     <p class="sub">198 days to go &middot; goal pace 4:30/km
       &middot; generated 2026-10-09</p>
     
+        <div class="block-divider">
+          <h2>Build-Up Phase</h2>
+          <p>Easy, flexible mileage build-up from a low base, coming off a break. No fixed structure, just aerobic volume.</p>
+        </div>
+        <section class="week behind">
+          <header>
+            <h2>Week of Oct 05, 2026</h2>
+            <span class="phase">Base-building</span>
+            <span class="total">2 runs, 17 km planned</span>
+            <span class="status">behind (0.0 / 17.0 km)</span>
+          </header>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">6 km</span> <span class="pace">@ 5:50/km, ~35m</span><div class="notes">extra kickstart run before the plan officially starts</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">extra kickstart run before the plan officially starts</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li></ul>
+        </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Oct 12, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">25 km planned</span>
+            <span class="total">3 runs, 19 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">7.2 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">7.2 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">10.5 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">6 km</span> <span class="pace">@ 5:10/km, ~31m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">6 km</span> <span class="pace">@ 5:10/km, ~31m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">7 km</span> <span class="pace">@ 5:43/km, ~40m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Oct 19, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">28 km planned</span>
+            <span class="total">3 runs, 20 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">8.1 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">8.1 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">11.8 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">6 km</span> <span class="pace">@ 5:40/km, ~34m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">6 km</span> <span class="pace">@ 5:40/km, ~34m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Oct 26, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">31 km planned</span>
+            <span class="total">3 runs, 25 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">9.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">9.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">13.0 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">9 km</span> <span class="pace">@ 5:33/km, ~50m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Nov 02, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">27 km planned</span>
+            <span class="total">3 runs, 25 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">7.8 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">7.8 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">11.3 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">9 km</span> <span class="pace">@ 5:33/km, ~50m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Nov 09, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">37 km planned</span>
+            <span class="total">3 runs, 26 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">10.8 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">10.8 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">15.5 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">8 km</span> <span class="pace">@ 5:38/km, ~45m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">10 km</span> <span class="pace">@ 5:30/km, ~55m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Nov 16, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">41 km planned</span>
+            <span class="total">3 runs, 34 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.9 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.9 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">17.2 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">12 km</span> <span class="pace">@ 5:25/km, ~65m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Nov 23, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">44 km planned</span>
+            <span class="total">3 runs, 34 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">12.8 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">12.8 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">18.5 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">12 km</span> <span class="pace">@ 5:25/km, ~65m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Nov 30, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">38 km planned</span>
+            <span class="total">3 runs, 34 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Long run (flexible day)</span> <span class="km">16.0 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">12 km</span> <span class="pace">@ 5:25/km, ~65m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Dec 07, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">50 km planned</span>
+            <span class="total">3 runs, 40 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.3 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.3 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Easy run (flexible day)</span> <span class="km">11.3 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Thu</span> <span class="w">Long run (flexible day)</span> <span class="km">16.0 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Dec 14, 2026</h2>
             <span class="phase">Base-building</span>
-            <span class="total">53 km planned</span>
+            <span class="total">3 runs, 37 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Easy run (flexible day)</span> <span class="km">12.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Tue</span> <span class="w">Easy run (flexible day)</span> <span class="km">12.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Wed</span> <span class="w">Easy run (flexible day)</span> <span class="km">12.0 km</span><div class="notes">move to whichever day suits you this week</div></li><li><span class="d">Thu</span> <span class="w">Long run (flexible day)</span> <span class="km">17.0 km</span><div class="notes">move to whichever day suits you this week</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 2</span> <span class="w">Easy run (flexible day)</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">Comfortable aerobic running. Move it to whichever day suits you this week.</div></li><li><span class="d">Run 3</span> <span class="w">Long run (flexible day)</span> <span class="km">15 km</span> <span class="pace">@ 5:20/km, ~80m</span><div class="notes">move to whichever day suits you this week</div><div class="explain">The week&#x27;s longest run, still at an easy, conversational effort. This is about time on feet, not pace.</div></li></ul>
         </section>
+        <div class="block-divider">
+          <h2>18-Week Marathon Plan</h2>
+          <p>Structured block adapted from Pete Pfitzinger&#x27;s Advanced Marathoning (“Up to 55 Miles per Week”), with every speed/interval session swapped for general-aerobic or marathon-pace running.</p>
+        </div>
         <section class="week upcoming">
           <header>
             <h2>Week of Dec 21, 2026</h2>
             <span class="phase">Endurance</span>
-            <span class="total">53 km planned</span>
+            <span class="total">4 runs, 54 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">9.5 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">11.7 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">9.5 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">22.3 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">18 km</span> <span class="pace">@ 5:17/km, ~95m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Dec 28, 2026</h2>
             <span class="phase">Endurance</span>
-            <span class="total">56 km planned</span>
+            <span class="total">4 runs, 55 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">10.1 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">12.3 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">10.1 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">23.5 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Jan 04, 2027</h2>
             <span class="phase">Endurance</span>
-            <span class="total">59 km planned</span>
+            <span class="total">4 runs, 55 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">10.6 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">13.0 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">10.6 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">24.8 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Jan 11, 2027</h2>
             <span class="phase">Endurance</span>
-            <span class="total">50 km planned</span>
+            <span class="total">4 runs, 55 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">9.0 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">11.0 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">9.0 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">21.0 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Jan 18, 2027</h2>
             <span class="phase">Endurance</span>
-            <span class="total">65 km planned</span>
+            <span class="total">4 runs, 55 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">11.7 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">14.3 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">11.7 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">27.3 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Jan 25, 2027</h2>
             <span class="phase">LT+endurance (adapted: general aerobic)</span>
-            <span class="total">68 km planned</span>
+            <span class="total">4 runs, 56 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">12.2 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">15.0 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">12.2 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">28.6 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">20 km</span> <span class="pace">@ 5:30/km, ~110m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Feb 01, 2027</h2>
             <span class="phase">LT+endurance (adapted: general aerobic)</span>
-            <span class="total">71 km planned</span>
+            <span class="total">4 runs, 56 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">12.8 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">15.6 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">12.8 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">29.8 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">20 km</span> <span class="pace">@ 5:30/km, ~110m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Feb 08, 2027</h2>
             <span class="phase">LT+endurance (adapted: general aerobic)</span>
-            <span class="total">59 km planned</span>
+            <span class="total">4 runs, 62 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">10.6 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">13.0 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">10.6 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">24.8 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">22 km</span> <span class="pace">@ 5:27/km, ~120m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Feb 15, 2027</h2>
             <span class="phase">LT+endurance (adapted: general aerobic)</span>
-            <span class="total">77 km planned</span>
+            <span class="total">4 runs, 68 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">12.3 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">16.9 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">Recovery + optional strides</span> <span class="km">8.5 km</span><div class="notes">6-8 x 100m relaxed strides optional, not required</div></li><li><span class="d">Sat</span> <span class="w">Recovery</span> <span class="km">8.5 km</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">30.8 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">17 km</span> <span class="pace">@ 5:18/km, ~90m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">25 km</span> <span class="pace">@ 5:24/km, ~135m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Feb 22, 2027</h2>
             <span class="phase">LT+endurance (adapted: general aerobic)</span>
-            <span class="total">80 km planned</span>
+            <span class="total">5 runs, 76 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">12.8 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">17.6 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">Recovery + optional strides</span> <span class="km">8.8 km</span><div class="notes">6-8 x 100m relaxed strides optional, not required</div></li><li><span class="d">Sat</span> <span class="w">Recovery</span> <span class="km">8.8 km</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">32.0 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">Recovery + optional strides</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="notes">strides are relaxed and quick, not a sprint, not required</div><div class="explain">Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</div></li><li><span class="d">Run 4</span> <span class="w">Recovery</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="explain">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</div></li><li><span class="d">Run 5</span> <span class="w">Long run</span> <span class="km">24 km</span> <span class="pace">@ 5:25/km, ~130m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Mar 01, 2027</h2>
             <span class="phase">LT+endurance (adapted: general aerobic)</span>
-            <span class="total">83 km planned</span>
+            <span class="total">4 runs, 68 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">13.3 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">18.3 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">Recovery + optional strides</span> <span class="km">9.1 km</span><div class="notes">6-8 x 100m relaxed strides optional, not required</div></li><li><span class="d">Sat</span> <span class="w">Recovery</span> <span class="km">9.1 km</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">33.2 km</span></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">17 km</span> <span class="pace">@ 5:18/km, ~90m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">25 km</span> <span class="pace">@ 5:24/km, ~135m</span><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Mar 08, 2027</h2>
             <span class="phase">Race preparation</span>
-            <span class="total">69 km planned</span>
+            <span class="total">5 runs, 76 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">12.4 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">15.2 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">12.4 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">29.0 km</span><div class="notes">include ~16.0 km at marathon pace, rest easy</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">Recovery + optional strides</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="notes">strides are relaxed and quick, not a sprint, not required</div><div class="explain">Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</div></li><li><span class="d">Run 4</span> <span class="w">Recovery</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="explain">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</div></li><li><span class="d">Run 5</span> <span class="w">Long run</span> <span class="km">24 km</span> <span class="pace">@ 5:00/km, ~120m</span><div class="notes">include ~13 km at marathon pace (4:30/km), rest easy</div><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Mar 15, 2027</h2>
             <span class="phase">Race preparation</span>
-            <span class="total">89 km planned</span>
+            <span class="total">5 runs, 90 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">14.2 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">19.6 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">Recovery + optional strides</span> <span class="km">9.8 km</span><div class="notes">6-8 x 100m relaxed strides optional, not required</div></li><li><span class="d">Sat</span> <span class="w">Recovery</span> <span class="km">9.8 km</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">35.6 km</span><div class="notes">include ~19.6 km at marathon pace, rest easy</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">16 km</span> <span class="pace">@ 5:38/km, ~90m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">22 km</span> <span class="pace">@ 5:27/km, ~120m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">Recovery + optional strides</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="notes">strides are relaxed and quick, not a sprint, not required</div><div class="explain">Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</div></li><li><span class="d">Run 4</span> <span class="w">Recovery</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="explain">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</div></li><li><span class="d">Run 5</span> <span class="w">Long run</span> <span class="km">32 km</span> <span class="pace">@ 4:51/km, ~155m</span><div class="notes">include ~18 km at marathon pace (4:30/km), rest easy</div><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Mar 22, 2027</h2>
             <span class="phase">Race preparation</span>
-            <span class="total">89 km planned</span>
+            <span class="total">5 runs, 82 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">14.2 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">19.6 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">Recovery + optional strides</span> <span class="km">9.8 km</span><div class="notes">6-8 x 100m relaxed strides optional, not required</div></li><li><span class="d">Sat</span> <span class="w">Recovery</span> <span class="km">9.8 km</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">35.6 km</span><div class="notes">include ~19.6 km at marathon pace, rest easy</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">Recovery + optional strides</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="notes">strides are relaxed and quick, not a sprint, not required</div><div class="explain">Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</div></li><li><span class="d">Run 4</span> <span class="w">Recovery</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="explain">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</div></li><li><span class="d">Run 5</span> <span class="w">Long run</span> <span class="km">30 km</span> <span class="pace">@ 5:00/km, ~150m</span><div class="notes">include ~16 km at marathon pace (4:30/km), rest easy</div><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Mar 29, 2027</h2>
-            <span class="phase">Taper</span>
-            <span class="total">67 km planned</span>
+            <span class="phase">Race preparation</span>
+            <span class="total">5 runs, 83 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">12.1 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">14.7 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">12.1 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">28.1 km</span><div class="notes">include ~15.5 km at marathon pace, rest easy</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">16 km</span> <span class="pace">@ 5:38/km, ~90m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">19 km</span> <span class="pace">@ 5:32/km, ~105m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">Recovery + optional strides</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="notes">strides are relaxed and quick, not a sprint, not required</div><div class="explain">Easy run; finish with 6-8 x 100m relaxed, fast-feeling strides if your legs want it. Strides are optional, skip them anytime without consequence.</div></li><li><span class="d">Run 4</span> <span class="w">Recovery</span> <span class="km">10 km</span> <span class="pace">@ 6:00/km, ~60m</span><div class="explain">Short and deliberately slow, the day after a harder session. The point is recovery, not fitness.</div></li><li><span class="d">Run 5</span> <span class="w">Long run</span> <span class="km">28 km</span> <span class="pace">@ 5:00/km, ~140m</span><div class="notes">include ~15 km at marathon pace (4:30/km), rest easy</div><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Apr 05, 2027</h2>
             <span class="phase">Taper</span>
-            <span class="total">53 km planned</span>
+            <span class="total">4 runs, 70 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">General aerobic</span> <span class="km">9.5 km</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">11.7 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">9.5 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">22.3 km</span><div class="notes">include ~12.3 km at marathon pace, rest easy</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">17 km</span> <span class="pace">@ 5:18/km, ~90m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">13 km</span> <span class="pace">@ 5:46/km, ~75m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">27 km</span> <span class="pace">@ 4:49/km, ~130m</span><div class="notes">include ~15 km at marathon pace (4:30/km), rest easy</div><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Apr 12, 2027</h2>
             <span class="phase">Taper</span>
-            <span class="total">40 km planned</span>
+            <span class="total">4 runs, 51 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">12.8 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">11.2 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Long run</span> <span class="km">16.0 km</span><div class="notes">include ~8.8 km at marathon pace, rest easy</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 2</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 3</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 4</span> <span class="w">Long run</span> <span class="km">15 km</span> <span class="pace">@ 5:00/km, ~75m</span><div class="notes">include ~8 km at marathon pace (4:30/km), rest easy</div><div class="explain">The week&#x27;s most important session. Builds the endurance and fatigue resistance marathon day demands.</div></li></ul>
         </section>
         <section class="week upcoming">
           <header>
             <h2>Week of Apr 19, 2027</h2>
             <span class="phase">Taper</span>
-            <span class="total">61 km planned</span>
+            <span class="total">3 runs, 67 km planned</span>
             <span class="status">upcoming</span>
           </header>
-          <ul class="days"><li><span class="d">Mon</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Tue</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Wed</span> <span class="w">Medium-long run</span> <span class="km">9.9 km</span></li><li><span class="d">Thu</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Fri</span> <span class="w">General aerobic</span> <span class="km">8.7 km</span></li><li><span class="d">Sat</span> <span class="w">Rest or cross-train</span></li><li><span class="d">Sun</span> <span class="w">Goal marathon</span> <span class="km">42.2 km</span><div class="notes">race day</div></li></ul>
+          <ul class="days"><li><span class="d">Run 1</span> <span class="w">Medium-long run</span> <span class="km">14 km</span> <span class="pace">@ 5:21/km, ~75m</span><div class="explain">A longer run slipped into the middle of the week. Builds endurance without the fatigue cost of the weekend long run.</div></li><li><span class="d">Run 2</span> <span class="w">General aerobic</span> <span class="km">11 km</span> <span class="pace">@ 5:27/km, ~60m</span><div class="explain">Comfortable, conversational effort. This is the bulk of your aerobic base-building, not a workout to push.</div></li><li><span class="d">Run 3</span> <span class="w">Goal marathon</span> <span class="km">42.2 km</span> <span class="pace">@ 4:30/km</span><div class="notes">race day</div><div class="explain">Race day. Hold your planned pace, especially through the first 10K; it&#x27;s easy to go out too fast.</div></li></ul>
         </section>
   </div>
 </body>
