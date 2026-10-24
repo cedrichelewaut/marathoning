@@ -32,6 +32,36 @@ h1 {
 .countdown { margin: 0 0 2px; color: #676879; font-size: 14px; white-space: nowrap; }
 .board { padding-bottom: 8px; }
 .board-inner { min-width: 0; }
+.phases {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin: 18px 0 6px;
+}
+.phasebar {
+  min-width: 0; background: #f5f6f8; border-left: 6px solid #c4c4c4;
+  border-radius: 0 6px 6px 0; padding: 10px 14px 12px;
+}
+.phasebar.plan { border-left-color: #ff642e; background: #fff4ee; }
+.phasebar-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 4px 12px; flex-wrap: wrap; min-width: 0;
+}
+.phasebar-name {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.1px; color: #676879;
+  min-width: 0;
+}
+.phasebar.plan .phasebar-name { color: #323338; }
+.phasebar-km {
+  margin-left: auto; font-size: 13px; font-weight: 600; color: #323338;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.phasebar-track {
+  margin-top: 8px; height: 10px; background: #e6e9ef;
+  border-radius: 999px; overflow: hidden;
+}
+.phasebar.plan .phasebar-track { background: #ffd0c2; }
+.phasebar-fill { display: block; height: 100%; border-radius: 999px; background: #676879; }
+.phasebar.plan .phasebar-fill { background: #ff642e; }
+.phasebar-weeks { margin: 6px 0 0; color: #676879; font-size: 12px; }
 .group { margin-top: 26px; }
 summary { list-style: none; cursor: pointer; }
 summary::-webkit-details-marker { display: none; }
@@ -151,6 +181,8 @@ footer p { margin: 0; }
   h1 { font-size: 26px; }
   .top { flex-direction: column; align-items: flex-start; gap: 4px; }
   .subtitle { white-space: normal; }
+  .phases { grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
+  .phasebar { padding: 10px 12px; }
   .colhead, .phase { display: none; }
   .row {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -179,10 +211,14 @@ footer p { margin: 0; }
       <div>
         <h1>Marathon training</h1>
         <p class="subtitle">Hamburg Marathon · April 25, 2027 · goal pace 4:30/km</p>
-        <p class="updated">Last updated 24 Oct 2026, 12:44</p>
+        <p class="updated">Last updated 24 Oct 2026, 13:01</p>
       </div>
       <p class="countdown">183 days to go</p>
     </header>
+    <section class="phases" aria-label="Plan progress">
+<div class="phasebar base"><div class="phasebar-head"><span class="phasebar-name">Base building</span><span class="phasebar-km">61.2 km / 311 km</span></div><div class="phasebar-track" role="img" aria-label="Base building, 61.2 km / 311 km"><span class="phasebar-fill" style="width:19.7%"></span></div><p class="phasebar-weeks" title="Finished weeks at 85% of the planned distance">2/11 weeks</p></div>
+<div class="phasebar plan"><div class="phasebar-head"><span class="phasebar-name">Marathon training · 18 weeks</span><span class="phasebar-km">0 km / 1179.2 km</span></div><div class="phasebar-track" role="img" aria-label="Marathon training · 18 weeks, 0 km / 1179.2 km"></div><p class="phasebar-weeks" title="Finished weeks at 85% of the planned distance">0/18 weeks</p></div>
+</section>
     <div class="board"><div class="board-inner">
 <details class="group completed">
 <summary class="ghead">

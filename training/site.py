@@ -353,6 +353,59 @@ def group_weeks(weeks: list[WeekView]) -> dict[str, list[WeekView]]:
     return grouped
 
 
+@dataclass
+class PhaseProgress:
+    kind: str
+    label: str
+    actual_km: float
+    planned_km: float
+    weeks_done: int
+    weeks_total: int
+
+    @property
+    def pct(self) -> float:
+        if self.planned_km <= 0:
+            return 0.0
+        return min(100.0, self.actual_km / self.planned_km * 100)
+
+
+def phase_km_label(phase: PhaseProgress) -> str:
+    return f"{fmt_km(phase.actual_km)} km / {fmt_km(phase.planned_km)} km"
+
+
+def phase_weeks_label(phase: PhaseProgress) -> str:
+    unit = "week" if phase.weeks_total == 1 else "weeks"
+    return f"{phase.weeks_done}/{phase.weeks_total} {unit}"
+
+
+def phase_progress(weeks: list[WeekView]) -> tuple[PhaseProgress, PhaseProgress]:
+    """Kilometres and finished weeks for base building and the 18-week block.
+
+    Actual kilometres are whatever each week already logged. A finished week
+    counts as done at the same 85% bar as the Completed summary.
+    """
+    def pack(kind: str, label: str, chosen: list[WeekView]) -> PhaseProgress:
+        done = sum(
+            1 for week in chosen
+            if week.bucket == "completed" and counts_as_done(week.planned_km, week.actual_km)
+        )
+        return PhaseProgress(
+            kind=kind,
+            label=label,
+            actual_km=sum(week.actual_km for week in chosen),
+            planned_km=sum(week.planned_km for week in chosen),
+            weeks_done=done,
+            weeks_total=len(chosen),
+        )
+
+    base = [week for week in weeks if not week.plan_week]
+    plan = [week for week in weeks if week.plan_week]
+    return (
+        pack("base", "Base building", base),
+        pack("plan", "Marathon training · 18 weeks", plan),
+    )
+
+
 def _esc(value: str | None) -> str:
     return html.escape(value or "", quote=True)
 
@@ -506,6 +559,31 @@ def _row(week: WeekView, today: datetime.date) -> str:
 </details>"""
 
 
+def _phase_bars(weeks: list[WeekView]) -> str:
+    parts = []
+    for phase in phase_progress(weeks):
+        km = phase_km_label(phase)
+        weeks_label = phase_weeks_label(phase)
+        width = _fmt_width(phase.pct)
+        fill = (
+            f'<span class="phasebar-fill" style="width:{width}%"></span>'
+            if phase.pct > 0 else ""
+        )
+        parts.append(
+            f'<div class="phasebar {phase.kind}">'
+            '<div class="phasebar-head">'
+            f'<span class="phasebar-name">{_esc(phase.label)}</span>'
+            f'<span class="phasebar-km">{_esc(km)}</span>'
+            "</div>"
+            f'<div class="phasebar-track" role="img" aria-label="{_esc(phase.label)}, {_esc(km)}">'
+            f"{fill}</div>"
+            f'<p class="phasebar-weeks" title="Finished weeks at 85% of the planned distance">'
+            f"{_esc(weeks_label)}</p>"
+            "</div>"
+        )
+    return '<section class="phases" aria-label="Plan progress">\n' + "\n".join(parts) + "\n</section>"
+
+
 def _group_summary(bucket: str, weeks: list[WeekView]) -> str:
     if bucket == "completed":
         return completed_summary(weeks)
@@ -588,6 +666,36 @@ h1 {
 .countdown { margin: 0 0 2px; color: #676879; font-size: 14px; white-space: nowrap; }
 .board { padding-bottom: 8px; }
 .board-inner { min-width: 0; }
+.phases {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin: 18px 0 6px;
+}
+.phasebar {
+  min-width: 0; background: #f5f6f8; border-left: 6px solid #c4c4c4;
+  border-radius: 0 6px 6px 0; padding: 10px 14px 12px;
+}
+.phasebar.plan { border-left-color: #ff642e; background: #fff4ee; }
+.phasebar-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 4px 12px; flex-wrap: wrap; min-width: 0;
+}
+.phasebar-name {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.1px; color: #676879;
+  min-width: 0;
+}
+.phasebar.plan .phasebar-name { color: #323338; }
+.phasebar-km {
+  margin-left: auto; font-size: 13px; font-weight: 600; color: #323338;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.phasebar-track {
+  margin-top: 8px; height: 10px; background: #e6e9ef;
+  border-radius: 999px; overflow: hidden;
+}
+.phasebar.plan .phasebar-track { background: #ffd0c2; }
+.phasebar-fill { display: block; height: 100%; border-radius: 999px; background: #676879; }
+.phasebar.plan .phasebar-fill { background: #ff642e; }
+.phasebar-weeks { margin: 6px 0 0; color: #676879; font-size: 12px; }
 .group { margin-top: 26px; }
 summary { list-style: none; cursor: pointer; }
 summary::-webkit-details-marker { display: none; }
@@ -707,6 +815,8 @@ footer p { margin: 0; }
   h1 { font-size: 26px; }
   .top { flex-direction: column; align-items: flex-start; gap: 4px; }
   .subtitle { white-space: normal; }
+  .phases { grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
+  .phasebar { padding: 10px 12px; }
   .colhead, .phase { display: none; }
   .row {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -796,6 +906,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
       </div>
       <p class="countdown">{_esc(_countdown(race_date, today))}</p>
     </header>
+    {_phase_bars(weeks)}
     <div class="board"><div class="board-inner">
 {groups_html}
     </div></div>

@@ -17,6 +17,25 @@ def _write(path: Path, text: str) -> None:
 
 
 class SummaryTests(unittest.TestCase):
+    def test_phase_progress_counts_finished_weeks_and_logged_km(self) -> None:
+        weeks = [
+            site.WeekView(datetime.date(2026, 10, 5), "Base-building", 17, 16.54, 11, 10,
+                          bucket="completed"),
+            site.WeekView(datetime.date(2026, 10, 12), "Base-building", 19, 26.01, 7, 12,
+                          bucket="completed"),
+            site.WeekView(datetime.date(2026, 10, 19), "Base-building", 20, 6, 8, 6,
+                          bucket="this-week"),
+            site.WeekView(datetime.date(2026, 12, 21), "Endurance", 54, 0, 18, 0,
+                          bucket="upcoming", plan_week=1),
+        ]
+        base, plan = site.phase_progress(weeks)
+        self.assertEqual(site.phase_km_label(base), "48.5 km / 56 km")
+        self.assertEqual(site.phase_weeks_label(base), "2/3 weeks")
+        self.assertEqual(site.phase_km_label(plan), "0 km / 54 km")
+        self.assertEqual(site.phase_weeks_label(plan), "0/1 week")
+        self.assertAlmostEqual(base.pct, 48.55 / 56 * 100, places=2)
+        self.assertEqual(plan.pct, 0.0)
+
     def test_eighteen_week_block_counts_back_from_race_week(self) -> None:
         race = datetime.date(2027, 4, 25)  # Sunday
         self.assertEqual(site.plan_block_start(race), datetime.date(2026, 12, 21))
@@ -162,11 +181,15 @@ class PageTests(unittest.TestCase):
         self.assertIn(">Week 1<", upcoming[week_one - 40:week_one])
         week_eighteen = upcoming.find("Apr 19 – 25")
         self.assertIn(">Week 18<", upcoming[week_eighteen - 40:week_eighteen])
-        completed = page.split('class="group this-week"', 1)[0]
+        completed = page.split('class="group completed"', 1)[1].split('class="group this-week"', 1)[0]
         self.assertIn("Base building", completed)
         self.assertNotIn("Marathon training · 18 weeks", completed)
         self.assertNotIn("flexible day", page)
         self.assertNotIn(">Day<", page)
+        self.assertIn('class="phasebar base"', page)
+        self.assertIn('class="phasebar plan"', page)
+        self.assertIn("km / ", page)
+        self.assertIn("0/18 weeks", page)
         self.assertIn("fill green", page)
         self.assertIn("bar neutral", page)
         self.assertNotIn('class="pill', page)
