@@ -1,0 +1,55 @@
+name: Regenerate site from logged runs
+
+# The daily updater only commits new rows to data/strava_runs.csv (via the
+# GitHub API; it does not run Python). This workflow regenerates the
+# aggregated totals and the page, then commits those outputs.
+#
+# Loop guard: the job never stages data/strava_runs.csv, so its push does
+# not match the path filter. Pushes made with the default GITHUB_TOKEN also
+# do not start a new workflow run.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/strava_runs.csv
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: regenerate-site
+  cancel-in-progress: false
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Regenerate weekly totals and the page
+        run: python cli.py sync-site
+
+      - name: Commit regenerated outputs
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- data/weekly_status.csv docs/index.html docs/.nojekyll
+          if git diff --cached --name-only | grep -E 'strava_runs\.csv|strava_auth|runs\.csv|books/'; then
+            echo "Refusing to commit the run log, secrets, or local-only files." >&2
+            exit 1
+          fi
+          if git diff --cached --quiet; then
+            echo "Weekly totals and the page are already up to date."
+          else
+            git commit -m "Regenerate training site from logged runs"
+            git push
+          fi

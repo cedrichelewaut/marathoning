@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import datetime
+import re
 from dataclasses import dataclass
 
 
@@ -39,6 +40,68 @@ def load_runs(path: str) -> list[dict]:
             return list(csv.DictReader(f))
     except FileNotFoundError:
         return []
+
+
+# Tracked run log. No tokens. strava_activity_id is the dedupe key.
+STRAVA_RUN_COLUMNS = ("date", "name", "distance_km", "moving_time", "strava_activity_id")
+_MOVING_TIME = re.compile(r"^\d+:[0-5]\d:[0-5]\d$")
+
+
+def load_strava_runs(path: str) -> tuple[list[dict], int]:
+    """Read data/strava_runs.csv for week totals.
+
+    Returns (run rows for week_status, number of duplicate activity ids skipped).
+    A repeated strava_activity_id counts once, first row wins. The file is the
+    only actual-km input the site needs; private exports and API tokens are not.
+    """
+    try:
+        handle = open(path, newline="", encoding="utf-8")
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            f"Missing {path}. The site reads actual km from that tracked CSV."
+        ) from exc
+    runs: list[dict] = []
+    seen: set[str] = set()
+    skipped = 0
+    with handle:
+        reader = csv.DictReader(handle)
+        header = reader.fieldnames or []
+        missing = [col for col in STRAVA_RUN_COLUMNS if col not in header]
+        if missing:
+            raise ValueError(
+                f"{path} is missing columns {missing}. "
+                f"Expected {', '.join(STRAVA_RUN_COLUMNS)}."
+            )
+        for line_no, row in enumerate(reader, start=2):
+            if not any((row.get(col) or "").strip() for col in STRAVA_RUN_COLUMNS):
+                continue
+            activity_id = (row.get("strava_activity_id") or "").strip()
+            if not activity_id:
+                raise ValueError(f"{path}:{line_no}: strava_activity_id is required (it dedupes runs).")
+            if activity_id in seen:
+                skipped += 1
+                continue
+            seen.add(activity_id)
+            date_text = (row.get("date") or "").strip()
+            try:
+                datetime.date.fromisoformat(date_text)
+            except ValueError as exc:
+                raise ValueError(f"{path}:{line_no}: date must be YYYY-MM-DD, got {date_text!r}.") from exc
+            try:
+                distance = float((row.get("distance_km") or "").strip())
+            except ValueError as exc:
+                raise ValueError(
+                    f"{path}:{line_no}: distance_km must be a number, got {row.get('distance_km')!r}."
+                ) from exc
+            if distance < 0:
+                raise ValueError(f"{path}:{line_no}: distance_km cannot be negative.")
+            moving = (row.get("moving_time") or "").strip()
+            if not _MOVING_TIME.match(moving):
+                raise ValueError(
+                    f"{path}:{line_no}: moving_time must be h:mm:ss, got {moving!r}."
+                )
+            runs.append({"date": date_text, "distance_km": f"{distance:.4f}"})
+    return runs, skipped
 
 
 def week_status(schedule_rows: list[dict], run_rows: list[dict],
