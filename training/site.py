@@ -87,21 +87,52 @@ def completed_summary(weeks: list[WeekView]) -> str:
     return f"{fmt_km(actual)}/{fmt_km(planned)} km completed, {done}/{total} {unit}"
 
 
-def status_for(week: WeekView, today: datetime.date) -> tuple[str, str]:
-    """Return (css class, label) for the week's status pill.
+# A day can still absorb about this much. More than that, with the days
+# that are left, is more than the week can realistically finish.
+_DAILY_KM = 20.0
 
-    Upcoming weeks are Not started. A week at the on-track bar is Done.
-    The current week stays On track until it ends, because a session can
-    move to another day. A finished week under the bar is Behind.
+
+def _days_left(week: WeekView, today: datetime.date) -> int:
+    """Days from today through Sunday, counting today. Zero once the week has ended."""
+    week_end = week.week_start + datetime.timedelta(days=6)
+    if today > week_end:
+        return 0
+    start = max(today, week.week_start)
+    return (week_end - start).days + 1
+
+
+def _days_elapsed(week: WeekView, today: datetime.date) -> int:
+    """Finished days in the week, not counting today."""
+    if today <= week.week_start:
+        return 0
+    week_end = week.week_start + datetime.timedelta(days=6)
+    if today > week_end:
+        return 7
+    return (today - week.week_start).days
+
+
+def progress_tone(week: WeekView, today: datetime.date) -> str:
+    """Bar color: green, yellow, red, or neutral.
+
+    Future weeks stay grey. Green means the week is at the done bar, or
+    logged kilometres are keeping up with a straight line through the week.
+    Red means the kilometres still to go are more than 20 km for each day
+    left, which is what happens with less than two days left and a large
+    gap, and for any finished week under the done bar. Yellow is behind
+    that line while the remainder can still be run.
     """
-    del today  # The bucket is already chosen from this date.
     if week.bucket == "upcoming":
-        return "not-started", "Not started"
+        return "neutral"
     if week.planned_km <= 0 or counts_as_done(week.planned_km, week.actual_km):
-        return "done", "Done"
-    if week.bucket == "this-week":
-        return "on-track", "On track"
-    return "behind", "Behind"
+        return "green"
+    remaining = max(0.0, week.planned_km - week.actual_km)
+    left = _days_left(week, today)
+    if remaining > left * _DAILY_KM:
+        return "red"
+    expected = week.planned_km * _days_elapsed(week, today) / 7
+    if week.actual_km + 0.5 >= expected:
+        return "green"
+    return "yellow"
 
 
 def delta_label(actual_km: float, planned_km: float) -> str:
@@ -343,39 +374,34 @@ def _is_rest(day: dict) -> bool:
     return day.get("workout") == "Rest or cross-train"
 
 
-def _plan_text(days: list[dict]) -> str:
-    bits: list[str] = []
-    for day in days:
-        if _is_rest(day):
-            continue
-        parts: list[str] = []
-        if day.get("distance_km"):
-            parts.append(f"{fmt_km(float(day['distance_km']))} km")
-        if day.get("pace_per_km"):
-            parts.append(f"{day['pace_per_km']}/km")
-        if day.get("duration"):
-            parts.append(day["duration"])
-        if parts:
-            bits.append(" · ".join(parts))
-    return " · ".join(bits) if bits else "—"
+def _session_name(workout: str) -> str:
+    """Drop a parenthetical such as '(flexible day)'. Days are not part of the plan."""
+    name = workout or ""
+    cut = name.find(" (")
+    if cut != -1:
+        name = name[:cut]
+    return name.strip() or (workout or "").strip()
 
 
-def _day_label(iso: str) -> str:
-    day = datetime.date.fromisoformat(iso)
-    return f"{day.strftime('%a')} {day.day}"
+def _session_title(planned: dict) -> str:
+    name = _session_name(planned.get("workout") or "")
+    if planned.get("distance_km"):
+        return f"{name} · {fmt_km(float(planned['distance_km']))} km"
+    return name or "Session"
 
 
-def _run_text(run: dict, *, include_date: bool) -> str:
-    name = (run.get("name") or "").strip() or "Run"
-    pieces: list[str] = []
-    if include_date and run.get("date"):
-        pieces.append(_day_label(run["date"]))
-    pieces.append(name)
-    pieces.append(f"{fmt_km(float(run['distance_km']))} km")
+def _run_measure(run: dict) -> str:
+    """Distance and moving time, with no calendar day."""
+    pieces = [f"{fmt_km(float(run['distance_km']))} km"]
     moving = (run.get("moving_time") or "").strip()
     if moving:
         pieces.append(moving)
     return " · ".join(pieces)
+
+
+def _run_text(run: dict) -> str:
+    name = (run.get("name") or "").strip() or "Run"
+    return f"{name} · {_run_measure(run)}"
 
 
 def _tag_class(label: str) -> str:
@@ -401,32 +427,25 @@ def _session_rows(week: WeekView) -> str:
         return '<p class="why">No runs scheduled.</p>'
     parts = [
         '<div class="session head">'
-        "<span>Day</span><span>Session</span><span>Plan</span><span>Logged run</span><span>Vs plan</span>"
+        "<span>Session</span><span>Logged run</span><span>Vs plan</span>"
         "</div>"
     ]
     for match in matches:
         if match.role == "additional" and match.run is not None:
-            when = _day_label(match.run["date"]) if match.run.get("date") else ""
             what = (match.run.get("name") or "").strip() or "Run"
-            plan = "—"
-            logged = _run_text(match.run, include_date=False)
+            logged = _run_measure(match.run)
             logged_class = "logged"
         else:
-            planned = match.planned or {}
-            when = _day_label(planned["date"]) if planned.get("date") else ""
-            what = planned.get("workout") or ""
-            plan = _plan_text([planned]) if planned else "—"
+            what = _session_title(match.planned or {})
             if match.run is not None:
-                logged = _run_text(match.run, include_date=True)
+                logged = _run_text(match.run)
                 logged_class = "logged"
             else:
                 logged = "—"
                 logged_class = "logged wait"
         parts.append(
             '<div class="session">'
-            f'<span class="when">{_esc(when)}</span>'
             f'<span class="what">{_esc(what)}</span>'
-            f'<span class="plan">{_esc(plan)}</span>'
             f'<span class="{logged_class}">{_esc(logged)}</span>'
             f'<span class="spill"><span class="tag {_tag_class(match.label)}">{_esc(match.label)}</span></span>'
             "</div>"
@@ -435,23 +454,24 @@ def _session_rows(week: WeekView) -> str:
 
 
 def _row(week: WeekView, today: datetime.date) -> str:
-    css, label = status_for(week, today)
+    tone = progress_tone(week, today)
     width = bar_width(week)
+    # A yellow or red week with no kilometres yet still shows a sliver of that color.
+    if tone in ("yellow", "red") and width < 4:
+        width = 4.0
     fill_html = (
-        f'<span class="fill {css}" style="width:{_fmt_width(width)}%"></span>' if width else ""
+        f'<span class="fill {tone}" style="width:{_fmt_width(width)}%"></span>' if width else ""
     )
     distance = _metric(week.actual_km, week.planned_km)
     long_run = _metric(week.long_actual_km, week.long_planned_km)
-    described = f"{fmt_km(week.actual_km)} of {fmt_km(week.planned_km)} kilometres"
+    described = f"{fmt_km(week.actual_km)} of {fmt_km(week.planned_km)} kilometres, {tone}"
     opened = " open" if week.bucket == "this-week" else ""
     return f"""<details class="item"{opened}>
 <summary class="row">
-  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>{_esc(_week_label(week))}</span>
+  <span class="name"><svg class="chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="weeklabel">{_esc(_week_label(week))}</span></span>
   <span class="phase" title="{_esc(week.phase)}">{_esc(_phase_label(week.phase))}</span>
-  <span class="progress"><span class="bar" role="img" aria-label="{_esc(described)}">{fill_html}</span></span>
-  <span class="metric">{_esc(distance)}</span>
-  <span class="metric">{_esc(long_run)}</span>
-  <span class="pill {css}">{label}</span>
+  <span class="progress"><span class="bar {tone}" role="img" aria-label="{_esc(described)}">{fill_html}</span><span class="km">{_esc(distance)}</span></span>
+  <span class="long">{_esc(long_run)}</span>
 </summary>
 <div class="subitems">{_session_rows(week)}</div>
 </details>"""
@@ -479,7 +499,7 @@ def _group(bucket: str, weeks: list[WeekView], today: datetime.date) -> str:
   <span class="gtitle"><svg class="chev" viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path d="M6 3.5l5 4.5-5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="gname">{title}</span><span class="gsum">{_esc(summary)}</span></span>
 </summary>
 <div class="colhead" aria-hidden="true">
-  <span></span><span>Phase</span><span>Progress</span><span>Distance</span><span>Long run</span><span>Status</span>
+  <span></span><span class="phase">Phase</span><span>Progress</span><span class="long">Long run</span>
 </div>
 <div class="rows">
 {rows}
@@ -508,8 +528,8 @@ h1 {
 }
 .subtitle { margin: 6px 0 0; color: #676879; font-size: 14px; white-space: nowrap; }
 .countdown { margin: 0 0 2px; color: #676879; font-size: 14px; white-space: nowrap; }
-.board { overflow-x: auto; padding-bottom: 8px; }
-.board-inner { min-width: 980px; }
+.board { padding-bottom: 8px; }
+.board-inner { min-width: 0; }
 .group { margin-top: 26px; }
 summary { list-style: none; cursor: pointer; }
 summary::-webkit-details-marker { display: none; }
@@ -525,7 +545,7 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 .group.upcoming { --group: #a25ddc; }
 .colhead, .row {
   display: grid;
-  grid-template-columns: minmax(200px, 1.6fr) 148px minmax(110px, 0.8fr) 120px 116px 168px;
+  grid-template-columns: minmax(180px, 1.5fr) 132px minmax(210px, 1.25fr) 108px;
   column-gap: 12px; align-items: center;
 }
 .colhead {
@@ -548,29 +568,21 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
   display: flex; align-items: center; gap: 8px;
   padding-left: 10px; font-size: 14px; color: #323338; min-width: 0;
 }
-.phase, .metric { font-size: 14px; color: #323338; white-space: nowrap; min-width: 0; }
+.weeklabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.phase, .long, .km { font-size: 14px; color: #323338; white-space: nowrap; min-width: 0; }
 .phase { overflow: hidden; text-overflow: ellipsis; }
-.metric { font-variant-numeric: tabular-nums; }
-.progress { display: flex; align-items: center; min-height: 40px; }
+.long, .km { font-variant-numeric: tabular-nums; }
+.progress { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 40px; }
 .bar {
-  display: block; width: 100%; max-width: 132px; height: 14px;
+  flex: 1 1 96px; width: auto; max-width: 148px; min-width: 72px; height: 14px;
   background: #e6e9ef; border-radius: 999px; overflow: hidden;
 }
+.bar.neutral { background: #e6e9ef; }
 .fill { display: block; height: 100%; border-radius: 999px; }
-.fill.done { background: #00c875; }
-.fill.on-track { background: #579bfc; }
-.fill.behind { background: #e2445c; }
-.fill.not-started { background: #c4c4c4; }
-.pill {
-  display: flex; align-items: center; justify-content: center;
-  height: 30px; margin: 5px 8px 5px 0; border-radius: 4px;
-  color: #fff; font-size: 14px; font-weight: 500; white-space: nowrap;
-}
-.pill.done { background: #00c875; }
-.pill.on-track { background: #579bfc; }
-.pill.behind { background: #e2445c; }
-.pill.not-started { background: #c4c4c4; }
-.pill.sm { height: 26px; margin: 0; width: 100%; font-size: 13px; }
+.fill.green { background: #00c875; }
+.fill.yellow { background: #fdab3d; }
+.fill.red { background: #e2445c; }
+.fill.neutral { background: #c4c4c4; }
 .tag {
   display: flex; align-items: center; justify-content: center;
   height: 26px; border-radius: 4px; color: #fff; font-size: 13px; font-weight: 500;
@@ -587,17 +599,17 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 }
 .session {
   display: grid;
-  grid-template-columns: 72px minmax(150px, 1.4fr) minmax(120px, 1fr) minmax(180px, 1.5fr) 116px;
+  grid-template-columns: minmax(160px, 1.2fr) minmax(180px, 1.5fr) 116px;
   gap: 6px 12px; align-items: center; padding: 5px 0;
   border-top: 1px solid #eceff3;
 }
 .session.head {
   border-top: 0; color: #676879; font-size: 12px; padding: 2px 0 0;
 }
-.session .when, .session .what, .session .plan, .session .logged {
+.session .what, .session .logged {
   font-size: 13px; color: #323338; min-width: 0;
 }
-.session .plan, .session .logged { font-variant-numeric: tabular-nums; }
+.session .logged { font-variant-numeric: tabular-nums; }
 .session .logged.miss { color: #e2445c; }
 .session .logged.wait { color: #676879; }
 .runline { display: block; overflow-wrap: anywhere; }
@@ -607,43 +619,36 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 footer { margin-top: 36px; color: #9699a6; font-size: 12px; line-height: 1.5; max-width: 720px; }
 footer p { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
-@media (max-width: 720px) {
-  .wrap { padding: 20px 16px 48px; }
+@media (max-width: 900px) {
+  .long { display: none; }
+  .colhead, .row {
+    grid-template-columns: minmax(150px, 1.3fr) minmax(96px, 130px) minmax(180px, 1fr);
+  }
+  .session { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) 104px; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 16px 12px 40px; }
   h1 { font-size: 26px; }
   .top { flex-direction: column; align-items: flex-start; gap: 4px; }
   .subtitle { white-space: normal; }
-  .board-inner { min-width: 0; }
-  .colhead { display: none; }
+  .colhead, .phase { display: none; }
   .row {
-    grid-template-columns: minmax(0, 1fr) 112px;
-    grid-template-areas:
-      "name pill"
-      "progress progress"
-      "distance distance";
-    row-gap: 2px;
-    padding-bottom: 6px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 8px;
   }
-  .name { grid-area: name; }
-  .phase { display: none; }
-  .progress { grid-area: progress; padding: 0 12px 2px 34px; }
-  .bar { max-width: none; }
-  .metric { grid-area: distance; padding: 0 12px 2px 34px; }
-  .metric + .metric { display: none; }
-  .pill { grid-area: pill; width: auto; min-width: 104px; margin: 6px 8px 6px 0; }
+  .name { padding-left: 8px; font-size: 13px; gap: 4px; }
+  .progress { gap: 8px; padding-right: 8px; min-height: 36px; }
+  .bar { flex: 0 0 64px; width: 64px; min-width: 64px; max-width: 64px; }
+  .km { font-size: 13px; }
   .session.head { display: none; }
   .session {
-    grid-template-columns: 58px minmax(0, 1fr) 104px;
-    grid-template-areas:
-      "when what spill"
-      "plan plan plan"
-      "logged logged logged";
+    grid-template-columns: minmax(0, 1fr) 96px;
+    grid-template-areas: "what spill" "logged logged";
     gap: 2px 8px;
     padding: 8px 0;
   }
-  .session .when { grid-area: when; }
   .session .what { grid-area: what; }
   .session .spill { grid-area: spill; }
-  .session .plan { grid-area: plan; color: #676879; font-size: 12px; }
   .session .logged { grid-area: logged; padding-bottom: 2px; }
 }
 """
@@ -700,7 +705,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
 {groups_html}
     </div></div>
     <footer>
-      <p>Every week shows logged kilometres against the plan. Inside a week, the longest run fills the long session and the other runs fill the closest remaining distances. A matched run shows its gap from the plan. Extra runs are Additional. A session with no run is Missed once the week is over, and To do until then. A past week counts as completed at 85% of its planned distance. Updated {today.isoformat()}.</p>
+      <p>The bar is green when a week is done or on pace, yellow when it is behind and the remaining kilometres still fit in the days left, and red when they do not. Weeks that have not started stay grey. Inside a week, the longest run fills the long session and the other runs fill the closest remaining distances. A past week counts as done at 85% of its planned distance. Updated {today.isoformat()}.</p>
     </footer>
   </div>
 </body>

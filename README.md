@@ -5,14 +5,19 @@ Training setup for Hamburg Marathon, 25 April 2027.
 Live schedule: https://cedrichelewaut.github.io/marathoning/
 
 The page compares the plan with `data/strava_runs.csv`. Every week shows
-planned km versus actual km, a progress bar, and a status pill: **Done**,
-**On track**, **Behind**, or **Not started**. The current week stays On
-track until it ends, because a session can move to another day.
+planned km versus actual km beside one progress bar. The bar is **green**
+when the week is done or on pace, **yellow** when it is behind and the
+remaining kilometres still fit in the days left (about 20 km a day), and
+**red** when they do not, including a finished week under the done bar and
+a week with less than two days left that is still a long way short. Weeks
+that have not started stay **grey**.
 
 **This week** is open, and the same comparison is in the expanded rows of
-**Completed**. Runs are matched within the week, not to a calendar date:
-the longest run fills the planned long run, and the other runs fill the
-closest remaining distances. A matched run shows a gap such as `+1 km`,
+**Completed**. A session is the run and its distance, for example
+`Easy run · 6 km`. Logged runs show their distance and time. Neither is
+tied to a day; the week header keeps the date range. Runs are matched
+within the week: the longest run fills the planned long run, and the other
+runs fill the closest remaining distances. A matched run shows a gap such as `+1 km`,
 `-1 km`, or `on plan` (within half a kilometre). Extra runs are
 **Additional**. A session with no run is **Missed** once the week is over,
 and **To do** until then. **Completed** stays collapsed; its header is the
