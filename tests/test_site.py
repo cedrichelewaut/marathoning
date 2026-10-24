@@ -149,7 +149,7 @@ class PageTests(unittest.TestCase):
         self.assertNotIn("flexible day", page)
         self.assertNotIn(">Day<", page)
         self.assertIn("fill yellow", page)
-        self.assertIn("fill red", page)
+        self.assertIn("fill green", page)
         self.assertNotIn('class="pill', page)
         self.assertNotIn("strava_auth", page)
         self.assertNotIn("refresh_token", page)
