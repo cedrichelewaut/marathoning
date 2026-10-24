@@ -13,9 +13,11 @@ a week with less than two days left that is still a long way short. Weeks
 that have not started stay **grey**.
 
 **This week** is open, and the same comparison is in the expanded rows of
-**Completed**. Runs are matched within the week, not to a calendar date:
-the longest run fills the planned long run, and the other runs fill the
-closest remaining distances. A matched run shows a gap such as `+1 km`,
+**Completed**. A session is the run and its distance, for example
+`Easy run · 6 km`. Logged runs show their distance and time. Neither is
+tied to a day; the week header keeps the date range. Runs are matched
+within the week: the longest run fills the planned long run, and the other
+runs fill the closest remaining distances. A matched run shows a gap such as `+1 km`,
 `-1 km`, or `on plan` (within half a kilometre). Extra runs are
 **Additional**. A session with no run is **Missed** once the week is over,
 and **To do** until then. **Completed** stays collapsed; its header is the

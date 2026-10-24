@@ -374,39 +374,34 @@ def _is_rest(day: dict) -> bool:
     return day.get("workout") == "Rest or cross-train"
 
 
-def _plan_text(days: list[dict]) -> str:
-    bits: list[str] = []
-    for day in days:
-        if _is_rest(day):
-            continue
-        parts: list[str] = []
-        if day.get("distance_km"):
-            parts.append(f"{fmt_km(float(day['distance_km']))} km")
-        if day.get("pace_per_km"):
-            parts.append(f"{day['pace_per_km']}/km")
-        if day.get("duration"):
-            parts.append(day["duration"])
-        if parts:
-            bits.append(" · ".join(parts))
-    return " · ".join(bits) if bits else "—"
+def _session_name(workout: str) -> str:
+    """Drop a parenthetical such as '(flexible day)'. Days are not part of the plan."""
+    name = workout or ""
+    cut = name.find(" (")
+    if cut != -1:
+        name = name[:cut]
+    return name.strip() or (workout or "").strip()
 
 
-def _day_label(iso: str) -> str:
-    day = datetime.date.fromisoformat(iso)
-    return f"{day.strftime('%a')} {day.day}"
+def _session_title(planned: dict) -> str:
+    name = _session_name(planned.get("workout") or "")
+    if planned.get("distance_km"):
+        return f"{name} · {fmt_km(float(planned['distance_km']))} km"
+    return name or "Session"
 
 
-def _run_text(run: dict, *, include_date: bool) -> str:
-    name = (run.get("name") or "").strip() or "Run"
-    pieces: list[str] = []
-    if include_date and run.get("date"):
-        pieces.append(_day_label(run["date"]))
-    pieces.append(name)
-    pieces.append(f"{fmt_km(float(run['distance_km']))} km")
+def _run_measure(run: dict) -> str:
+    """Distance and moving time, with no calendar day."""
+    pieces = [f"{fmt_km(float(run['distance_km']))} km"]
     moving = (run.get("moving_time") or "").strip()
     if moving:
         pieces.append(moving)
     return " · ".join(pieces)
+
+
+def _run_text(run: dict) -> str:
+    name = (run.get("name") or "").strip() or "Run"
+    return f"{name} · {_run_measure(run)}"
 
 
 def _tag_class(label: str) -> str:
@@ -432,32 +427,25 @@ def _session_rows(week: WeekView) -> str:
         return '<p class="why">No runs scheduled.</p>'
     parts = [
         '<div class="session head">'
-        '<span>Day</span><span>Session</span><span class="plan">Plan</span><span>Logged run</span><span>Vs plan</span>'
+        "<span>Session</span><span>Logged run</span><span>Vs plan</span>"
         "</div>"
     ]
     for match in matches:
         if match.role == "additional" and match.run is not None:
-            when = _day_label(match.run["date"]) if match.run.get("date") else ""
             what = (match.run.get("name") or "").strip() or "Run"
-            plan = "—"
-            logged = _run_text(match.run, include_date=False)
+            logged = _run_measure(match.run)
             logged_class = "logged"
         else:
-            planned = match.planned or {}
-            when = _day_label(planned["date"]) if planned.get("date") else ""
-            what = planned.get("workout") or ""
-            plan = _plan_text([planned]) if planned else "—"
+            what = _session_title(match.planned or {})
             if match.run is not None:
-                logged = _run_text(match.run, include_date=True)
+                logged = _run_text(match.run)
                 logged_class = "logged"
             else:
                 logged = "—"
                 logged_class = "logged wait"
         parts.append(
             '<div class="session">'
-            f'<span class="when">{_esc(when)}</span>'
             f'<span class="what">{_esc(what)}</span>'
-            f'<span class="plan">{_esc(plan)}</span>'
             f'<span class="{logged_class}">{_esc(logged)}</span>'
             f'<span class="spill"><span class="tag {_tag_class(match.label)}">{_esc(match.label)}</span></span>'
             "</div>"
@@ -611,17 +599,17 @@ summary:focus-visible { outline: 2px solid #579bfc; outline-offset: 2px; border-
 }
 .session {
   display: grid;
-  grid-template-columns: 72px minmax(150px, 1.4fr) minmax(120px, 1fr) minmax(180px, 1.5fr) 116px;
+  grid-template-columns: minmax(160px, 1.2fr) minmax(180px, 1.5fr) 116px;
   gap: 6px 12px; align-items: center; padding: 5px 0;
   border-top: 1px solid #eceff3;
 }
 .session.head {
   border-top: 0; color: #676879; font-size: 12px; padding: 2px 0 0;
 }
-.session .when, .session .what, .session .plan, .session .logged {
+.session .what, .session .logged {
   font-size: 13px; color: #323338; min-width: 0;
 }
-.session .plan, .session .logged { font-variant-numeric: tabular-nums; }
+.session .logged { font-variant-numeric: tabular-nums; }
 .session .logged.miss { color: #e2445c; }
 .session .logged.wait { color: #676879; }
 .runline { display: block; overflow-wrap: anywhere; }
@@ -636,10 +624,7 @@ footer p { margin: 0; }
   .colhead, .row {
     grid-template-columns: minmax(150px, 1.3fr) minmax(96px, 130px) minmax(180px, 1fr);
   }
-  .session {
-    grid-template-columns: 68px minmax(0, 1fr) minmax(0, 1.2fr) 100px;
-  }
-  .session .plan { display: none; }
+  .session { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr) 104px; }
 }
 @media (max-width: 640px) {
   .wrap { padding: 16px 12px 40px; }
@@ -657,14 +642,11 @@ footer p { margin: 0; }
   .km { font-size: 13px; }
   .session.head { display: none; }
   .session {
-    grid-template-columns: 52px minmax(0, 1fr) 92px;
-    grid-template-areas:
-      "when what spill"
-      "logged logged logged";
+    grid-template-columns: minmax(0, 1fr) 96px;
+    grid-template-areas: "what spill" "logged logged";
     gap: 2px 8px;
     padding: 8px 0;
   }
-  .session .when { grid-area: when; }
   .session .what { grid-area: what; }
   .session .spill { grid-area: spill; }
   .session .logged { grid-area: logged; padding-bottom: 2px; }
