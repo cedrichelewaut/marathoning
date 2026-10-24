@@ -17,6 +17,10 @@ def _write(path: Path, text: str) -> None:
 
 
 class SummaryTests(unittest.TestCase):
+    def test_last_updated_uses_brussels_time(self) -> None:
+        moment = datetime.datetime(2026, 10, 24, 10, 1, tzinfo=datetime.timezone.utc)
+        self.assertEqual(site.last_updated_label(moment), "Last updated 24 Oct 2026, 12:01")
+
     def test_fmt_km_trims_trailing_zero(self) -> None:
         self.assertEqual(site.fmt_km(17), "17")
         self.assertEqual(site.fmt_km(0), "0")
@@ -141,6 +145,7 @@ class PageTests(unittest.TestCase):
         self.assertIn("Easy run · 6 km", page)
         self.assertIn("Long run · 8 km", page)
         self.assertIn("Oct 19 – 25", page)
+        self.assertIn("Last updated", page)
         self.assertNotIn("flexible day", page)
         self.assertNotIn(">Day<", page)
         self.assertIn("fill yellow", page)

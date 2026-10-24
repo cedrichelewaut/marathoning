@@ -20,6 +20,9 @@ import csv
 import datetime
 import html
 from dataclasses import dataclass, field
+from zoneinfo import ZoneInfo
+
+_BRUSSELS = ZoneInfo("Europe/Brussels")
 
 
 # Same cut as WeekStatus.verdict: "on track" / "ahead" are a completed week.
@@ -527,6 +530,7 @@ h1 {
   color: #323338; line-height: 1.15;
 }
 .subtitle { margin: 6px 0 0; color: #676879; font-size: 14px; white-space: nowrap; }
+.updated { margin: 2px 0 0; color: #676879; font-size: 13px; }
 .countdown { margin: 0 0 2px; color: #676879; font-size: 14px; white-space: nowrap; }
 .board { padding-bottom: 8px; }
 .board-inner { min-width: 0; }
@@ -654,6 +658,16 @@ footer p { margin: 0; }
 """
 
 
+def last_updated_label(now: datetime.datetime | None = None) -> str:
+    """Clock time in Europe/Brussels, shown at the top of the page."""
+    moment = now or datetime.datetime.now(_BRUSSELS)
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=_BRUSSELS)
+    else:
+        moment = moment.astimezone(_BRUSSELS)
+    return f"Last updated {moment.strftime('%-d %b %Y, %H:%M')}"
+
+
 def _countdown(race_date: datetime.date, today: datetime.date) -> str:
     days = (race_date - today).days
     if days > 1:
@@ -668,8 +682,16 @@ def _countdown(race_date: datetime.date, today: datetime.date) -> str:
 def render(schedule_path: str, weekly_status_path: str, race_name: str,
            race_date: datetime.date, goal_pace: str,
            today: datetime.date | None = None,
-           runs_path: str | None = None) -> str:
-    today = today or datetime.date.today()
+           runs_path: str | None = None,
+           now: datetime.datetime | None = None) -> str:
+    if now is None:
+        brussels_now = datetime.datetime.now(_BRUSSELS)
+    elif now.tzinfo is None:
+        brussels_now = now.replace(tzinfo=_BRUSSELS)
+    else:
+        brussels_now = now.astimezone(_BRUSSELS)
+    today = today or brussels_now.date()
+    updated = last_updated_label(brussels_now)
     run_rows = None
     if runs_path:
         from training import status as status_mod
@@ -698,6 +720,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
       <div>
         <h1>Marathon training</h1>
         <p class="subtitle">{subtitle}</p>
+        <p class="updated">{_esc(updated)}</p>
       </div>
       <p class="countdown">{_esc(_countdown(race_date, today))}</p>
     </header>
@@ -705,7 +728,7 @@ def render(schedule_path: str, weekly_status_path: str, race_name: str,
 {groups_html}
     </div></div>
     <footer>
-      <p>The bar is green when a week is done or on pace, yellow when it is behind and the remaining kilometres still fit in the days left, and red when they do not. Weeks that have not started stay grey. Inside a week, the longest run fills the long session and the other runs fill the closest remaining distances. A past week counts as done at 85% of its planned distance. Updated {today.isoformat()}.</p>
+      <p>The bar is green when a week is done or on pace, yellow when it is behind and the remaining kilometres still fit in the days left, and red when they do not. Weeks that have not started stay grey. Inside a week, the longest run fills the long session and the other runs fill the closest remaining distances. A past week counts as done at 85% of its planned distance.</p>
     </footer>
   </div>
 </body>
